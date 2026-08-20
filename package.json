@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "npx wrangler pages dev ./dist",
-    "check": "astro check"
+    "preview": "wrangler dev",
+    "check": "astro check",
+    "deploy": "wrangler deploy",
+    "check:deploy": "wrangler deploy --dry-run"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.2.3",
@@ -17,6 +19,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.124.0"
   }
 }

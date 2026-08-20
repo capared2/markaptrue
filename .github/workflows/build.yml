@@ -27,3 +27,8 @@ jobs:
 
       - name: Construir el sitio
         run: npm run build
+
+      # Comprueba que el resultado es un worker desplegable: sin esto, un
+      # build correcto puede seguir sin publicar nada util.
+      - name: Comprobar que el worker se puede desplegar
+        run: npm run check:deploy

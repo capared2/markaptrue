@@ -4,8 +4,8 @@ Frontend que presenta el archivo de noticias de [marca.com](https://www.marca.co
 recogido por el scraper que vive en
 [**capared2/markap**](https://github.com/capared2/markap).
 
-Hecho con **Astro 7 + TypeScript + Tailwind 4**, renderizado en el servidor con
-el adaptador de **Cloudflare**.
+Hecho con **Astro 7 + TypeScript + Tailwind 4**, renderizado en el servidor
+sobre **Cloudflare Workers**.
 
 ## Cómo obtiene los datos
 
@@ -38,9 +38,9 @@ definir la variable de entorno `DATASET_BASE_URL`. Por defecto:
 ## Por qué SSR y no páginas estáticas
 
 El archivo crece sin límite. Prerenderizar una página por noticia chocaría con
-el tope de 20.000 ficheros por despliegue de Cloudflare Pages, así que las
-páginas se generan en el edge y se cachean allí. El número de ficheros
-desplegados no depende del tamaño del archivo.
+los límites de ficheros por despliegue, así que las páginas se generan en el
+edge y se cachean allí. El número de ficheros desplegados no depende del
+tamaño del archivo.
 
 Cada página descarga solo lo que necesita:
 
@@ -57,22 +57,37 @@ npm install
 npm run dev      # localhost:4321, leyendo el dataset publicado
 npm run build
 npm run check    # comprobación de tipos
-npm run preview  # sirve el build con wrangler, como lo verá Cloudflare
+npm run build
+npm run preview  # sirve el build en el runtime real de Workers
 ```
 
-## Despliegue en Cloudflare Pages
+## Despliegue en Cloudflare Workers
 
-Conectando este repositorio desde el panel de Cloudflare:
+**Va en Workers, no en Pages.** `@astrojs/cloudflare` construye para Workers:
+genera `dist/server/` (el worker) y `dist/client/` (los assets estáticos), no
+el `_worker.js` con `_routes.json` que espera Pages. Subir este `dist` a un
+proyecto de Pages publica solo los ficheros estáticos, sin ejecutar nada, y
+todas las rutas responden **404**.
+
+Desde el panel de Cloudflare: **Workers & Pages → Create → Workers → Import a
+repository**, y se conecta este repositorio con:
 
 | Ajuste | Valor |
 | --- | --- |
-| Framework preset | Astro |
 | Build command | `npm run build` |
-| Build output directory | `dist` |
+| Deploy command | `npx wrangler deploy` |
 | `NODE_VERSION` | `22` |
 
 No hace falta ningún secreto ni ninguna conexión con el repositorio del
-scraper: el dataset se lee de una URL pública.
+scraper: el dataset se lee de una URL pública. El namespace KV que usa Astro
+para las sesiones se aprovisiona solo en el primer despliegue.
+
+También se puede desplegar a mano:
+
+```bash
+npm run build
+npx wrangler deploy
+```
 
 ## Estructura
 
