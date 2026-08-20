@@ -1,20 +1,24 @@
-# markaptrue — sitio del archivo de noticias de Marca
+# markaptrue — markap, agregador de noticias deportivas
 
-Frontend que presenta el archivo de noticias de [marca.com](https://www.marca.com/)
-recogido por el scraper que vive en
-[**capared2/markap**](https://github.com/capared2/markap).
+Frontend de **markap**: reúne noticias de la prensa deportiva, las ordena por
+categoría y enlaza cada una a su publicación original.
 
 Hecho con **Astro 7 + TypeScript + Tailwind 4**, renderizado en el servidor
 sobre **Cloudflare Workers**.
 
+El sitio es **agnóstico de la fuente**: cada noticia declara de dónde viene y
+el medio se deduce de su propia URL, así que sumar fuentes nuevas no obliga a
+tocar el frontend.
+
 ## Cómo obtiene los datos
 
-Este repositorio **no guarda ninguna noticia**: las lee del repositorio del
-scraper por HTTP, en tiempo de ejecución.
+Este repositorio **no guarda ninguna noticia**: las lee por HTTP, en tiempo de
+ejecución, del repositorio que se encarga de recogerlas
+([capared2/markap](https://github.com/capared2/markap)).
 
 ```
 capared2/markap  ──── data/*.json ────►  raw.githubusercontent.com
-   (scraper)                                       │
+  (recolección)                                    │
                                                    ▼
                                           este sitio (Cloudflare)
                                                    │
@@ -26,7 +30,7 @@ Esto tiene dos consecuencias útiles: el sitio no necesita reconstruirse cuando
 entran noticias nuevas (aparecen solas), y las dos piezas evolucionan por
 separado.
 
-GitHub sirve esos JSON con `max-age=300` y el scraper publica cada dos horas,
+GitHub sirve esos JSON con `max-age=300` y la recolección publica cada dos horas,
 así que el archivo llega fresco. Encima, cada página se cachea en el edge de
 Cloudflare (`s-maxage` + `stale-while-revalidate`), de modo que la mayoría de
 las visitas ni siquiera llegan a pedir nada a GitHub.
@@ -78,9 +82,9 @@ repository**, y se conecta este repositorio con:
 | Deploy command | `npx wrangler deploy` |
 | `NODE_VERSION` | `22` |
 
-No hace falta ningún secreto ni ninguna conexión con el repositorio del
-scraper: el dataset se lee de una URL pública. El namespace KV que usa Astro
-para las sesiones se aprovisiona solo en el primer despliegue.
+No hace falta ningún secreto ni ninguna conexión con el repositorio de
+recolección: el dataset se lee de una URL pública. El namespace KV que usa
+Astro para las sesiones se aprovisiona solo en el primer despliegue.
 
 También se puede desplegar a mano:
 
@@ -107,7 +111,7 @@ src/
 
 ## Aviso
 
-Los contenidos mostrados proceden de marca.com, propiedad de Unidad Editorial.
-Este sitio no está afiliado a Marca ni a Unidad Editorial y se publica con
-fines de consulta e investigación personal; los derechos de cada noticia
-pertenecen a su editor.
+markap es un agregador: reúne y ordena noticias publicadas por medios
+deportivos, y cada una enlaza a su publicación original. Los derechos de cada
+noticia pertenecen al medio que la publicó; markap no está afiliado a ninguno
+de ellos.

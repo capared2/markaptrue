@@ -13,7 +13,7 @@ const { indice } = Astro.props;
     {
       indice && (
         <p class="mb-2 text-sm font-semibold">
-          {numero(indice.total_articles)} noticias archivadas en {numero(indice.total_categories)} categorías
+          {numero(indice.total_articles)} noticias en {numero(indice.total_categories)} categorías
           <span class="font-normal text-[var(--color-tinta-tenue)]">
             · actualizado el {fecha(indice.generated_at, true)}
           </span>
@@ -21,14 +21,10 @@ const { indice } = Astro.props;
       )
     }
     <p class="max-w-[65ch] text-xs leading-relaxed text-[var(--color-tinta-tenue)]">
-      Archivo generado automáticamente a partir de contenidos publicados en{" "}<a
-        href="https://www.marca.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="underline hover:text-[var(--color-marca)]">marca.com</a
-      >, propiedad de Unidad Editorial. Este sitio no está afiliado a Marca ni a
-      Unidad Editorial y se publica con fines de consulta e investigación
-      personal; los derechos de cada noticia pertenecen a su editor.
+      markap es un agregador: reúne y ordena noticias publicadas por medios
+      deportivos, y cada una enlaza a su publicación original. Los derechos de
+      cada noticia pertenecen al medio que la publicó; markap no está afiliado
+      a ninguno de ellos.
     </p>
   </div>
 </footer>

@@ -80,15 +80,15 @@ const ACENTOS: Record<string, string> = {
   "juegos-olimpicos": "Juegos Olímpicos",
   esports: "eSports",
   tiramillas: "Tiramillas",
-  // Ediciones internacionales de Marca, que cuelgan de su propio prefijo.
-  co: "Marca Colombia",
-  mx: "Marca México",
-  us: "Marca USA",
-  en: "Marca English",
-  ar: "Marca Argentina",
-  cl: "Marca Chile",
-  pe: "Marca Perú",
-  ve: "Marca Venezuela",
+  // Ediciones regionales, que cuelgan de su propio prefijo.
+  co: "Colombia",
+  mx: "México",
+  us: "Estados Unidos",
+  en: "Internacional",
+  ar: "Argentina",
+  cl: "Chile",
+  pe: "Perú",
+  ve: "Venezuela",
   "claro-sports": "Claro Sports",
   "combates-ufc": "Combates / UFC",
 };
@@ -153,4 +153,18 @@ export function fechaLarga(valor: Date): string {
     timeZone: "Europe/Madrid",
   }).format(valor);
   return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+/**
+ * Medio del que procede una noticia, deducido de su propia URL.
+ *
+ * El agregador no sabe de antemano de dónde vienen las noticias: cada una
+ * declara su origen, así que sumar fuentes nuevas no obliga a tocar el sitio.
+ */
+export function nombreFuente(url: string, respaldo = "la fuente original"): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return respaldo;
+  }
 }

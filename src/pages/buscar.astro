@@ -37,7 +37,7 @@ const resultados = !terminos.length
   <header class="mb-6">
     <p class="text-xs font-bold uppercase tracking-widest text-[var(--color-marca)]">Búsqueda</p>
     <h1 class="mt-1 font-display text-4xl font-extrabold tracking-tight">
-      {consulta ? `«${consulta}»` : "Buscar en el archivo"}
+      {consulta ? `«${consulta}»` : "Buscar noticias"}
     </h1>
     <p class="mt-1 text-sm text-[var(--color-tinta-tenue)]">
       {
@@ -52,7 +52,7 @@ const resultados = !terminos.length
     consulta && resultados.length === 0 ? (
       <Vacio
         titulo="Sin resultados"
-        detalle="La búsqueda cubre las noticias más recientes del archivo. Prueba con otros términos o entra por categoría."
+        detalle="La búsqueda cubre las noticias más recientes. Prueba con otros términos o entra por categoría."
       />
     ) : (
       resultados.length > 0 && <Rejilla articulos={resultados} />

@@ -15,7 +15,7 @@ interface Props {
 
 const {
   titulo,
-  descripcion = "Archivo navegable de las noticias publicadas en marca.com, ordenado por categoría.",
+  descripcion = "Agregador de noticias deportivas: los titulares del día reunidos y ordenados por categoría.",
   indice,
   cache = 900,
   categoriaActiva,
@@ -51,8 +51,8 @@ Astro.response.headers.set(
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23d8232a'/><text x='50' y='72' font-size='62' font-family='Helvetica,Arial' font-weight='bold' fill='white' text-anchor='middle'>m</text></svg>"
     />
     <script is:inline>
-      // Las fotos siguen alojadas en el CDN de Marca: si alguna desaparece,
-      // se oculta en vez de mostrar el icono de imagen rota.
+      // Las fotos las sirve cada medio de origen: si alguna desaparece, se
+      // oculta en vez de mostrar el icono de imagen rota.
       addEventListener(
         "error",
         (evento) => {

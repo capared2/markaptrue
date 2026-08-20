@@ -54,12 +54,12 @@ const sueltas = candidatas
 const hoy = fechaLarga(new Date());
 ---
 
-<Base titulo="markap · archivo de noticias de Marca" indice={indice} cache={600}>
+<Base titulo="markap · agregador de noticias deportivas" indice={indice} cache={600}>
   <div class="mb-6 flex flex-wrap items-baseline justify-between gap-2 border-b border-[var(--color-linea)] pb-3">
     <h1 class="font-display text-4xl font-extrabold uppercase tracking-tight">Portada</h1>
     <p class="text-sm text-[var(--color-tinta-tenue)]">
       <span>{hoy}</span>
-      {indice && ` · ${numero(indice.total_articles)} noticias archivadas`}
+      {indice && ` · ${numero(indice.total_articles)} noticias reunidas`}
       {indice && ` · actualizado ${fecha(indice.generated_at, true)}`}
     </p>
   </div>
@@ -67,8 +67,8 @@ const hoy = fechaLarga(new Date());
   {
     articulos.length === 0 ? (
       <Vacio
-        titulo="Todavía no hay noticias archivadas"
-        detalle="Ejecuta el workflow «Scrape Marca» en GitHub Actions para llenar el archivo."
+        titulo="Todavía no hay noticias"
+        detalle="En cuanto entren las primeras se mostrarán aquí, ordenadas por categoría."
       />
     ) : (
       <>
@@ -97,7 +97,7 @@ const hoy = fechaLarga(new Date());
           <section class="mt-10">
             <header class="mb-4 border-t-2 border-[var(--color-tinta-tenue)] pt-3">
               <h2 class="font-display text-xl font-extrabold uppercase tracking-wide">
-                También en el archivo
+                También hoy
               </h2>
             </header>
             <div class="grid gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -113,7 +113,7 @@ const hoy = fechaLarga(new Date());
             href="/categorias"
             class="rounded-full border border-[var(--color-linea)] px-5 py-2 text-sm font-semibold hover:border-[var(--color-marca)] hover:text-[var(--color-marca)]"
           >
-            Ver todas las categorías del archivo
+            Ver todas las categorías
           </a>
         </p>
       </>

@@ -2,7 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import Tarjeta from "../../components/Tarjeta.astro";
 import { obtenerIndice, obtenerNoticia, obtenerRelacionadas } from "../../lib/data";
-import { enlaceCategoria, fecha, nombreCategoria } from "../../lib/format";
+import { enlaceCategoria, fecha, nombreCategoria, nombreFuente } from "../../lib/format";
 
 // La ruta es /noticia/<categoria con barras>/<id>
 const ruta = (Astro.params.ruta ?? "").split("/").filter(Boolean);
@@ -23,6 +23,7 @@ if (!noticia) {
 }
 
 const relacionadas = await obtenerRelacionadas(noticia);
+const fuente = nombreFuente(noticia.url);
 const portada = noticia.images?.[0];
 const galeria = (noticia.images ?? []).slice(1, 5);
 ---
@@ -108,15 +109,17 @@ const galeria = (noticia.images ?? []).slice(1, 5);
       )
     }
 
-    <a
-      href={noticia.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="block rounded-xl border border-[var(--color-linea)] bg-[var(--color-lienzo)] p-4 text-sm text-[var(--color-tinta-suave)] hover:border-[var(--color-marca)] hover:text-[var(--color-marca)]"
-    >
-      <strong class="block text-[var(--color-tinta)]">Leer en marca.com</strong>
-      Esta copia procede del archivo; el original y sus derechos pertenecen a Marca.
-    </a>
+    <p class="mt-8 border-t border-[var(--color-linea)] pt-3 text-xs text-[var(--color-tinta-tenue)]">
+      Publicado originalmente por{" "}
+      <a
+        href={noticia.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="underline underline-offset-2 hover:text-[var(--color-marca)]"
+      >
+        {fuente}
+      </a>.
+    </p>
   </article>
 
   {
