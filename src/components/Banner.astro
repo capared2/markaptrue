@@ -1,0 +1,34 @@
+---
+import { HUECOS, altoReservado } from "../lib/anuncios";
+
+interface Props {
+  /** Hueco del catálogo: horizontal, franja, rectangulo o vertical. */
+  hueco: keyof typeof HUECOS | string;
+  /** Clases extra del contenedor, para colocarlo en cada página. */
+  clase?: string;
+  /** Texto que explica qué es, en letra pequeña. */
+  etiqueta?: boolean;
+}
+
+const { hueco, clase = "", etiqueta = true } = Astro.props;
+const reserva = altoReservado(hueco);
+const disponible = hueco in HUECOS;
+---
+
+{
+  disponible && (
+    <aside
+      class:list={["mx-auto flex flex-col items-center", clase]}
+      data-anuncio={hueco}
+      style={`min-height:${reserva + (etiqueta ? 14 : 0)}px`}
+      aria-label="Publicidad"
+    >
+      {etiqueta && (
+        <span class="mb-1 text-[0.6rem] uppercase tracking-widest text-[var(--color-tinta-tenue)]">
+          Publicidad
+        </span>
+      )}
+      <div data-anuncio-hueco />
+    </aside>
+  )
+}

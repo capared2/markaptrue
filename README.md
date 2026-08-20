@@ -145,39 +145,37 @@ plan gratuito de Workers.
 
 ## Publicidad
 
-Las etiquetas de la red viven en `src/components/Anuncios.astro`, con **límite
-de frecuencia: cada visitante las ve una vez y no vuelve a verlas hasta pasadas
-12 horas**.
+Banners display integrados en el contenido. El catálogo de unidades está en
+`src/lib/anuncios.ts` y se colocan con `<Banner hueco="..." />`.
 
-La cuenta se lleva en el navegador (`localStorage`) y no en el servidor a
-propósito: las páginas se cachean en el edge de Cloudflare, así que la misma
-respuesta HTML se sirve a todo el mundo y no puede saber quién ya las vio.
+| Hueco | Escritorio | Móvil |
+| --- | --- | --- |
+| `horizontal` | 728×90 | 320×50 |
+| `franja` | 468×60 | 320×50 |
+| `rectangulo` | 300×250 | 300×250 |
+| `vertical` | 160×600 | no se carga |
 
-Se inyectan cuando el navegador está desocupado (`requestIdleCallback`), ya
-pintada la página, para que no compitan con el contenido.
+Dónde van:
 
-Se apagan con la variable de entorno `ANUNCIOS=0`, útil en desarrollo y para
-medir el rendimiento del sitio sin ellas.
+- **Noticia**: rectángulo flotado tras el tercer párrafo (el texto lo envuelve),
+  nativo tras el cuerpo y franja ancha antes de las relacionadas.
+- **Categoría**: franja tras la cabecera, vertical en la barra lateral y un
+  rectángulo cada seis tarjetas, ocupando el sitio de una.
+- **Portada**: rectángulo bajo «Última hora», franja tras la apertura, nativo
+  tras la segunda banda y otra franja tras la quinta.
 
-## Navegación y móvil
+Tres decisiones que hacen que esto funcione:
 
-El sitio se diseñó para que en un teléfono se llegue al contenido de
-inmediato, no después de recorrer la navegación:
+1. **Cada banner va en su propio iframe.** Todos los `invoke.js` leen la global
+   `atOptions`; compartiendo página se pisarían la variable y acabarían
+   mostrando todos la misma unidad, o ninguna.
+2. **De cada hueco se carga una sola unidad**, la que corresponde a la pantalla.
+   Cargar varias y ocultar las que sobran contaría impresiones que nadie ve, y
+   eso es tráfico inválido.
+3. **Se cargan al acercarse a la vista**, con 600 px de margen, y con la altura
+   reservada de antemano para que nada salte al aparecer.
 
-- **La lista completa de categorías va plegada en móvil** y desplegada en
-  escritorio. Con 255 categorías, dejarla abierta ponía 10.000 px por delante
-  de la primera noticia.
-- **En las páginas de categoría el contenido va primero** en móvil y la barra
-  lateral después; en escritorio se mantiene la barra a la izquierda.
-- **La sección activa se centra sola** en la barra horizontal de secciones al
-  cargar, para que nunca quede fuera de la parte visible.
-- **El buscador ocupa su propia fila** en pantallas pequeñas: encajado junto al
-  logo aplastaba el campo y empujaba el botón de tema fuera de la pantalla.
-- La portada muestra como mucho 8 bandas de sección; con todas se iba a más de
-  30.000 px en móvil.
-
-Comprobado a 360, 412, 768 y 1400 px: sin desbordes horizontales y con los
-controles de la cabecera siempre dentro de la pantalla.
+Se apagan con `ANUNCIOS=0`.
 
 ## Estructura
 

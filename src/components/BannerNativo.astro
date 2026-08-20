@@ -1,0 +1,19 @@
+---
+import { NATIVO } from "../lib/anuncios";
+
+interface Props {
+  clase?: string;
+}
+const { clase = "" } = Astro.props;
+---
+
+<!--
+  Unidad nativa: se integra con el contenido y solo admite una por página,
+  porque el identificador del contenedor es fijo.
+-->
+<aside class:list={["mx-auto w-full", clase]} aria-label="Publicidad">
+  <span class="mb-1 block text-[0.6rem] uppercase tracking-widest text-[var(--color-tinta-tenue)]">
+    Publicidad
+  </span>
+  <div id={NATIVO.id} data-anuncio-nativo></div>
+</aside>

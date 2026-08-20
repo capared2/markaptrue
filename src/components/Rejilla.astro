@@ -1,13 +1,16 @@
 ---
 import type { Noticia, Tarjeta as TipoTarjeta } from "../lib/types";
 import Tarjeta from "./Tarjeta.astro";
+import Banner from "./Banner.astro";
 
 interface Props {
   articulos: (TipoTarjeta | Noticia)[];
   columnas?: 2 | 3 | 4;
+  /** Intercala un anuncio cada N tarjetas, ocupando el sitio de una. */
+  anuncioCada?: number;
 }
 
-const { articulos, columnas = 3 } = Astro.props;
+const { articulos, columnas = 3, anuncioCada = 0 } = Astro.props;
 
 const rejilla = {
   2: "sm:grid-cols-2",
@@ -17,5 +20,17 @@ const rejilla = {
 ---
 
 <div class:list={["grid gap-5", rejilla]}>
-  {articulos.map((articulo) => <Tarjeta articulo={articulo} />)}
+  {
+    articulos.map((articulo, indice) => (
+      <>
+        <Tarjeta articulo={articulo} />
+        {anuncioCada > 0 && (indice + 1) % anuncioCada === 0 && indice + 1 < articulos.length && (
+          <Banner
+            hueco="rectangulo"
+            clase="justify-center rounded-xl border border-dashed border-[var(--color-linea)] py-4"
+          />
+        )}
+      </>
+    ))
+  }
 </div>

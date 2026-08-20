@@ -1,6 +1,8 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Tarjeta from "../../components/Tarjeta.astro";
+import Banner from "../../components/Banner.astro";
+import BannerNativo from "../../components/BannerNativo.astro";
 import { obtenerIndice, obtenerNoticia, obtenerRelacionadas } from "../../lib/data";
 import { enlaceCategoria, enlaceNoticia, fecha, nombreCategoria } from "../../lib/format";
 import { SITIO } from "../../lib/sitio";
@@ -27,6 +29,12 @@ if (!noticia) {
 const relacionadas = await obtenerRelacionadas(noticia);
 const portada = noticia.images?.[0];
 const resumen = (noticia.summary || noticia.standfirst || noticia.paragraphs[0] || "").slice(0, 200);
+
+// El rectángulo va tras el tercer párrafo: ya has entrado en la noticia y
+// todavía queda texto por delante, así que no corta la lectura de golpe.
+const CORTE = 3;
+const primeros = noticia.paragraphs.slice(0, CORTE);
+const resto = noticia.paragraphs.slice(CORTE);
 const galeria = (noticia.images ?? []).slice(1, 5);
 ---
 
@@ -97,8 +105,15 @@ const galeria = (noticia.images ?? []).slice(1, 5);
     }
 
     <div class="font-serif text-lg leading-relaxed">
-      {noticia.paragraphs.map((parrafo) => <p class="mb-5">{parrafo}</p>)}
+      {primeros.map((parrafo) => <p class="mb-5">{parrafo}</p>)}
+
+      {resto.length > 0 && <Banner hueco="rectangulo" clase="my-7 sm:float-right sm:ml-6 sm:mb-4" />}
+
+      {resto.map((parrafo) => <p class="mb-5">{parrafo}</p>)}
+      <div class="clear-both"></div>
     </div>
+
+    <BannerNativo clase="my-8" />
 
     {
       galeria.length > 0 && (
@@ -134,6 +149,8 @@ const galeria = (noticia.images ?? []).slice(1, 5);
       </a>
     </p>
   </article>
+
+  <Banner hueco="horizontal" clase="my-10" />
 
   {
     relacionadas.length > 0 && (

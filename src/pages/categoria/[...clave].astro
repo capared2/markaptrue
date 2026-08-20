@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import Barra from "../../components/Barra.astro";
 import Rejilla from "../../components/Rejilla.astro";
 import Vacio from "../../components/Vacio.astro";
+import Banner from "../../components/Banner.astro";
 import { obtenerIndice, obtenerPaginaCategoria } from "../../lib/data";
 import { enlaceCategoria, nombreCategoria, numero } from "../../lib/format";
 import { SITIO } from "../../lib/sitio";
@@ -38,6 +39,7 @@ const sufijo = pagina.pagina > 1 ? ` (página ${pagina.pagina})` : "";
   <div class="grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)]">
     <aside class="order-2 lg:order-1 lg:sticky lg:top-28 lg:self-start">
       <Barra indice={indice} activa={clave} />
+      <Banner hueco="vertical" clase="mt-6 hidden lg:flex" />
     </aside>
 
     <div class="order-1 lg:order-2">
@@ -49,9 +51,11 @@ const sufijo = pagina.pagina > 1 ? ` (página ${pagina.pagina})` : "";
         </p>
       </header>
 
+      <Banner hueco="horizontal" clase="mb-7" />
+
       {
         pagina.articulos.length > 0 ? (
-          <Rejilla articulos={pagina.articulos} />
+          <Rejilla articulos={pagina.articulos} anuncioCada={6} />
         ) : (
           <Vacio titulo="No hay noticias en esta página" />
         )

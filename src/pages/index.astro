@@ -5,6 +5,8 @@ import Rejilla from "../components/Rejilla.astro";
 import ListaUltimas from "../components/ListaUltimas.astro";
 import Seccion from "../components/Seccion.astro";
 import Vacio from "../components/Vacio.astro";
+import Banner from "../components/Banner.astro";
+import BannerNativo from "../components/BannerNativo.astro";
 import { obtenerIndice, obtenerPortada } from "../lib/data";
 import { fecha, fechaLarga, numero } from "../lib/format";
 import { SITIO } from "../lib/sitio";
@@ -103,13 +105,22 @@ const hoy = fechaLarga(new Date());
             )}
           </div>
 
-          <ListaUltimas articulos={ultimas} />
+          <div class="flex flex-col gap-6">
+            <ListaUltimas articulos={ultimas} />
+            <Banner hueco="rectangulo" clase="lg:sticky lg:top-28" />
+          </div>
         </div>
 
-        {bandas.map((banda) => (
-          <Seccion clave={banda.clave} total={banda.total}>
-            <Rejilla articulos={banda.lista} columnas={4} />
-          </Seccion>
+        <Banner hueco="horizontal" clase="my-8" />
+
+        {bandas.map((banda, indice) => (
+          <>
+            <Seccion clave={banda.clave} total={banda.total}>
+              <Rejilla articulos={banda.lista} columnas={4} />
+            </Seccion>
+            {indice === 1 && <BannerNativo clase="my-10" />}
+            {indice === 4 && <Banner hueco="horizontal" clase="my-10" />}
+          </>
         ))}
 
         {sueltas.length > 0 && (

@@ -1,63 +1,109 @@
 ---
+import { BASE_INVOKE, HUECOS, NATIVO } from "../lib/anuncios";
+
 /**
- * Etiquetas de la red publicitaria, con límite de frecuencia por visitante.
+ * Carga los banners que haya declarado la página.
  *
- * Cada persona las ve una vez y no vuelve a verlas hasta pasadas 12 horas.
- * La decisión se toma en el navegador y no en el servidor a propósito: las
- * páginas se cachean en el edge de Cloudflare, así que la misma respuesta HTML
- * se sirve a todo el mundo y no puede saber quién ya las vio.
+ * Tres decisiones que importan:
  *
- * Las etiquetas se inyectan cuando el navegador está desocupado, después de
- * pintar la página, para que no compitan con el contenido.
+ * 1. Cada banner va en su propio iframe. Todos los `invoke.js` leen la global
+ *    `atOptions`, así que compartiendo página se pisarían la variable.
+ * 2. De cada hueco se carga una sola unidad, la que corresponda a la pantalla.
+ *    Cargar varias y ocultar las que sobran contaría impresiones que nadie ve.
+ * 3. Se cargan al acercarse a la vista, no al abrir la página, para que no
+ *    compitan con el contenido.
  *
  * Se apagan del todo con la variable de entorno ANUNCIOS=0.
  */
 const activos = import.meta.env.ANUNCIOS !== "0";
 
-const ETIQUETAS = [
-  "https://pl30933674.effectivecpmnetwork.com/8c/2f/7d/8c2f7db2c63f127fdafad6c69bd49a8e.js",
-  "https://pl30933675.effectivecpmnetwork.com/5f/13/79/5f1379c4410d197110da14be30151add.js",
-];
-
-const HORAS = 12;
-
 const codigo = `
 (function () {
-  var ETIQUETAS = ${JSON.stringify(ETIQUETAS)};
-  var CLAVE = "jomperr.anuncios.visto";
-  var ESPERA = ${HORAS} * 60 * 60 * 1000;
+  var HUECOS = ${JSON.stringify(HUECOS)};
+  var BASE = ${JSON.stringify(BASE_INVOKE)};
+  var NATIVO = ${JSON.stringify(NATIVO)};
 
-  function toca() {
-    try {
-      var ultimo = Number(localStorage.getItem(CLAVE)) || 0;
-      if (Date.now() - ultimo < ESPERA) return false;
-      localStorage.setItem(CLAVE, String(Date.now()));
-      return true;
-    } catch (e) {
-      // Sin almacenamiento (modo privado, cookies bloqueadas) no hay forma de
-      // llevar la cuenta: se muestran.
-      return true;
+  function unidadPara(hueco) {
+    var variantes = HUECOS[hueco] || [];
+    var ancho = window.innerWidth;
+    for (var i = 0; i < variantes.length; i++) {
+      if (ancho >= variantes[i].desde) return variantes[i];
     }
+    return null;
   }
 
-  function inyectar() {
-    for (var i = 0; i < ETIQUETAS.length; i++) {
-      var s = document.createElement("script");
-      s.src = ETIQUETAS[i];
-      s.async = true;
-      document.body.appendChild(s);
+  function pintar(caja) {
+    var unidad = unidadPara(caja.getAttribute("data-anuncio"));
+    var destino = caja.querySelector("[data-anuncio-hueco]");
+    if (!unidad || !destino || caja.dataset.pintado) {
+      // Sin unidad para esta pantalla, el hueco no ocupa sitio.
+      if (!unidad) caja.style.display = "none";
+      return;
     }
+    caja.dataset.pintado = "1";
+
+    var dentro =
+      '<!doctype html><html><head><meta charset="utf-8">' +
+      '<style>html,body{margin:0;padding:0;overflow:hidden}</style></head><body>' +
+      '<scr' + 'ipt>window.atOptions=' +
+      JSON.stringify({ key: unidad.key, format: "iframe", height: unidad.alto, width: unidad.ancho, params: {} }) +
+      ';</scr' + 'ipt>' +
+      '<scr' + 'ipt src="' + BASE + '/' + unidad.key + '/invoke.js"></scr' + 'ipt>' +
+      '</body></html>';
+
+    var marco = document.createElement("iframe");
+    marco.width = unidad.ancho;
+    marco.height = unidad.alto;
+    marco.setAttribute("scrolling", "no");
+    marco.setAttribute("frameborder", "0");
+    marco.setAttribute("loading", "lazy");
+    marco.setAttribute("title", "Publicidad");
+    marco.style.cssText = "border:0;display:block;max-width:100%";
+    marco.srcdoc = dentro;
+    destino.appendChild(marco);
   }
 
-  function cuandoHayaHueco() {
-    if (window.requestIdleCallback) requestIdleCallback(inyectar, { timeout: 3000 });
-    else setTimeout(inyectar, 1200);
+  function pintarNativo(caja) {
+    if (caja.dataset.pintado) return;
+    caja.dataset.pintado = "1";
+    var s = document.createElement("script");
+    s.src = NATIVO.script;
+    s.async = true;
+    s.setAttribute("data-cfasync", "false");
+    document.body.appendChild(s);
   }
 
-  if (!toca()) return;
+  function arrancar() {
+    var cajas = [].slice.call(document.querySelectorAll("[data-anuncio]"));
+    var nativos = [].slice.call(document.querySelectorAll("[data-anuncio-nativo]"));
 
-  if (document.readyState === "complete") cuandoHayaHueco();
-  else addEventListener("load", cuandoHayaHueco, { once: true });
+    if (!window.IntersectionObserver) {
+      cajas.forEach(pintar);
+      nativos.forEach(pintarNativo);
+      return;
+    }
+
+    // Un margen generoso: así el banner ya está cuando llegas a él.
+    var vigia = new IntersectionObserver(
+      function (entradas) {
+        entradas.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          vigia.unobserve(e.target);
+          if (e.target.hasAttribute("data-anuncio-nativo")) pintarNativo(e.target);
+          else pintar(e.target);
+        });
+      },
+      { rootMargin: "600px 0px" },
+    );
+
+    cajas.concat(nativos).forEach(function (c) { vigia.observe(c); });
+  }
+
+  if (document.readyState === "loading") {
+    addEventListener("DOMContentLoaded", arrancar, { once: true });
+  } else {
+    arrancar();
+  }
 })();
 `;
 ---
