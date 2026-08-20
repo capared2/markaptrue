@@ -93,6 +93,12 @@ npm run build
 npx wrangler deploy
 ```
 
+## Norma para los enlaces salientes
+
+Todo enlace que apunte fuera del sitio lleva `rel="nofollow noopener noreferrer"`:
+ninguno transmite autoridad. Si añades enlaces externos nuevos, mantén ese
+`rel`.
+
 ## Estructura
 
 ```

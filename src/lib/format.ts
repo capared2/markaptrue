@@ -154,17 +154,3 @@ export function fechaLarga(valor: Date): string {
   }).format(valor);
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
-
-/**
- * Medio del que procede una noticia, deducido de su propia URL.
- *
- * El agregador no sabe de antemano de dónde vienen las noticias: cada una
- * declara su origen, así que sumar fuentes nuevas no obliga a tocar el sitio.
- */
-export function nombreFuente(url: string, respaldo = "la fuente original"): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return respaldo;
-  }
-}
