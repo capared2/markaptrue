@@ -3,7 +3,8 @@ export const SITIO = {
   nombre: "jomperr",
   dominio: "https://jomperr.com",
   titulo: "jomperr · Noticias deportivas de última hora",
-  lema: "Agregador de noticias deportivas",
+  // Corto a propósito: entero no cabe en la cabecera de un móvil sin recortarse.
+  lema: "Agregador de noticias",
   descripcion:
     "Toda la actualidad deportiva reunida en un solo sitio: fútbol, baloncesto, motor, tenis y más, " +
     "ordenada por categoría y actualizada cada pocas horas.",

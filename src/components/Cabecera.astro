@@ -30,15 +30,17 @@ const principales = [...new Set((indice?.categories ?? []).map((c) => c.category
   <div class="contenedor flex flex-wrap items-center gap-x-3 gap-y-2 py-3">
     <a
       href="/"
-      class="flex min-w-0 flex-1 items-center gap-2 sm:me-auto sm:flex-none"
+      class="flex min-w-0 flex-1 items-center gap-3 sm:me-auto sm:flex-none"
       aria-label={`${SITIO.nombre}, ir a la portada`}
     >
-      <Logo clase="size-8 text-[var(--color-marca)]" />
-      <span class="flex min-w-0 flex-col leading-none">
-        <strong class="font-display text-2xl font-extrabold lowercase leading-none tracking-tight">
+      <Logo clase="size-9 shrink-0 text-[var(--color-marca)]" />
+      <span class="flex min-w-0 flex-col">
+        <strong class="font-display text-2xl font-extrabold lowercase leading-[1.15] tracking-tight">
           {SITIO.nombre}
         </strong>
-        <small class="truncate text-[0.65rem] uppercase tracking-widest text-[var(--color-tinta-tenue)]">
+        <small
+          class="mt-[3px] truncate text-[0.62rem] uppercase leading-tight tracking-[0.14em] text-[var(--color-tinta-tenue)]"
+        >
           {SITIO.lema}
         </small>
       </span>
