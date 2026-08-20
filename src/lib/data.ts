@@ -91,6 +91,51 @@ export async function obtenerPaginaCategoria(
   };
 }
 
+/**
+ * Página de una sección que no tiene noticias propias, solo subsecciones.
+ *
+ * Marca cuelga secciones como «hockey» únicamente de sus hijas
+ * (hockey-hielo, hockey-patines). Sin esto, el enlace de la sección prometía
+ * noticias y llevaba a una página inexistente.
+ *
+ * Se limita el número de ficheros que se descargan: estas secciones son
+ * pequeñas, pero el tope evita que una que crezca dispare el coste.
+ */
+const MAX_FICHEROS_AGREGADOS = 12;
+
+export async function obtenerPaginaAgregada(
+  hijas: EntradaCategoria[],
+  pagina: number,
+  porPagina: number,
+): Promise<PaginaCategoria> {
+  const total = hijas.reduce((suma, c) => suma + c.articles, 0);
+  const paginas = Math.max(1, Math.ceil(total / porPagina));
+  const actual = Math.min(Math.max(1, pagina), paginas);
+
+  // Los ficheros más recientes de cada hija primero: son los que traen las
+  // noticias que encabezan la página.
+  const ficheros = hijas
+    .flatMap((c) => c.files.map((f, indice) => ({ categoria: c.category, archivo: f.file, indice })))
+    .sort((a, b) => b.indice - a.indice)
+    .slice(0, MAX_FICHEROS_AGREGADOS);
+
+  const lotes = await Promise.all(
+    ficheros.map(({ categoria, archivo }) =>
+      obtenerParte(categoria, Number(archivo.match(/part-(\d+)\.json$/)?.[1] ?? 1)),
+    ),
+  );
+
+  const articulos = porFecha(lotes.flatMap((parte) => parte?.articles ?? []));
+  const desde = (actual - 1) * porPagina;
+
+  return {
+    articulos: articulos.slice(desde, desde + porPagina),
+    total,
+    pagina: actual,
+    paginas: Math.max(1, Math.ceil(articulos.length / porPagina)),
+  };
+}
+
 /** Busca una noticia concreta resolviendo antes en que archivo vive. */
 export async function obtenerNoticia(categoria: string, id: string): Promise<Noticia | null> {
   const lookup = await leerJson<Lookup>(`/${categoria}/lookup.json`);
