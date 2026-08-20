@@ -145,9 +145,16 @@ plan gratuito de Workers.
 
 ## Publicidad
 
-Las etiquetas de la red viven en `src/components/Anuncios.astro` y se cargan en
-todas las páginas, al final del `body` y con `async`, para no bloquear el
-primer pintado. Hay `dns-prefetch` a sus dominios para que arranquen antes.
+Las etiquetas de la red viven en `src/components/Anuncios.astro`, con **límite
+de frecuencia: cada visitante las ve una vez y no vuelve a verlas hasta pasadas
+12 horas**.
+
+La cuenta se lleva en el navegador (`localStorage`) y no en el servidor a
+propósito: las páginas se cachean en el edge de Cloudflare, así que la misma
+respuesta HTML se sirve a todo el mundo y no puede saber quién ya las vio.
+
+Se inyectan cuando el navegador está desocupado (`requestIdleCallback`), ya
+pintada la página, para que no compitan con el contenido.
 
 Se apagan con la variable de entorno `ANUNCIOS=0`, útil en desarrollo y para
 medir el rendimiento del sitio sin ellas.

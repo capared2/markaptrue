@@ -1,12 +1,16 @@
 ---
 /**
- * Etiquetas de la red publicitaria, en todas las páginas.
+ * Etiquetas de la red publicitaria, con límite de frecuencia por visitante.
  *
- * Se cargan con `async` para no bloquear el primer pintado: son scripts de
- * terceros y sin eso retrasan el render de toda la página.
+ * Cada persona las ve una vez y no vuelve a verlas hasta pasadas 12 horas.
+ * La decisión se toma en el navegador y no en el servidor a propósito: las
+ * páginas se cachean en el edge de Cloudflare, así que la misma respuesta HTML
+ * se sirve a todo el mundo y no puede saber quién ya las vio.
  *
- * Se pueden apagar con la variable de entorno ANUNCIOS=0 (útil en desarrollo
- * y para medir el sitio sin ellos).
+ * Las etiquetas se inyectan cuando el navegador está desocupado, después de
+ * pintar la página, para que no compitan con el contenido.
+ *
+ * Se apagan del todo con la variable de entorno ANUNCIOS=0.
  */
 const activos = import.meta.env.ANUNCIOS !== "0";
 
@@ -14,14 +18,48 @@ const ETIQUETAS = [
   "https://pl30933674.effectivecpmnetwork.com/8c/2f/7d/8c2f7db2c63f127fdafad6c69bd49a8e.js",
   "https://pl30933675.effectivecpmnetwork.com/5f/13/79/5f1379c4410d197110da14be30151add.js",
 ];
+
+const HORAS = 12;
+
+const codigo = `
+(function () {
+  var ETIQUETAS = ${JSON.stringify(ETIQUETAS)};
+  var CLAVE = "jomperr.anuncios.visto";
+  var ESPERA = ${HORAS} * 60 * 60 * 1000;
+
+  function toca() {
+    try {
+      var ultimo = Number(localStorage.getItem(CLAVE)) || 0;
+      if (Date.now() - ultimo < ESPERA) return false;
+      localStorage.setItem(CLAVE, String(Date.now()));
+      return true;
+    } catch (e) {
+      // Sin almacenamiento (modo privado, cookies bloqueadas) no hay forma de
+      // llevar la cuenta: se muestran.
+      return true;
+    }
+  }
+
+  function inyectar() {
+    for (var i = 0; i < ETIQUETAS.length; i++) {
+      var s = document.createElement("script");
+      s.src = ETIQUETAS[i];
+      s.async = true;
+      document.body.appendChild(s);
+    }
+  }
+
+  function cuandoHayaHueco() {
+    if (window.requestIdleCallback) requestIdleCallback(inyectar, { timeout: 3000 });
+    else setTimeout(inyectar, 1200);
+  }
+
+  if (!toca()) return;
+
+  if (document.readyState === "complete") cuandoHayaHueco();
+  else addEventListener("load", cuandoHayaHueco, { once: true });
+})();
+`;
 ---
 
-{
-  activos && (
-    <>
-      {ETIQUETAS.map((src) => (
-        <script async is:inline src={src} />
-      ))}
-    </>
-  )
-}
+{activos && <script is:inline data-anuncios set:html={codigo} />}
