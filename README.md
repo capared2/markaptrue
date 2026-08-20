@@ -56,6 +56,8 @@ Cada página descarga solo lo que necesita:
 npm install
 npm run dev      # localhost:4321, leyendo el dataset publicado
 npm run build
+npm run check    # comprobación de tipos
+npm run preview  # sirve el build con wrangler, como lo verá Cloudflare
 ```
 
 ## Despliegue en Cloudflare Pages

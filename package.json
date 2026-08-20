@@ -6,9 +6,8 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "wrangler pages dev ./dist",
-    "check": "astro check",
-    "deploy": "wrangler pages deploy ./dist"
+    "preview": "npx wrangler pages dev ./dist",
+    "check": "astro check"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.2.3",
@@ -18,7 +17,6 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "playwright": "^1.62.1",
     "typescript": "^5.9.3"
   }
 }
