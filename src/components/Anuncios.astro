@@ -1,0 +1,27 @@
+---
+/**
+ * Etiquetas de la red publicitaria, en todas las páginas.
+ *
+ * Se cargan con `async` para no bloquear el primer pintado: son scripts de
+ * terceros y sin eso retrasan el render de toda la página.
+ *
+ * Se pueden apagar con la variable de entorno ANUNCIOS=0 (útil en desarrollo
+ * y para medir el sitio sin ellos).
+ */
+const activos = import.meta.env.ANUNCIOS !== "0";
+
+const ETIQUETAS = [
+  "https://pl30933674.effectivecpmnetwork.com/8c/2f/7d/8c2f7db2c63f127fdafad6c69bd49a8e.js",
+  "https://pl30933675.effectivecpmnetwork.com/5f/13/79/5f1379c4410d197110da14be30151add.js",
+];
+---
+
+{
+  activos && (
+    <>
+      {ETIQUETAS.map((src) => (
+        <script async is:inline src={src} />
+      ))}
+    </>
+  )
+}

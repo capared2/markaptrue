@@ -143,6 +143,15 @@ Los sitemaps los produce el proceso de recolección y aquí solo se sirven, sin
 parsearlos: construirlos en cada petición no cabría en los 10 ms de CPU del
 plan gratuito de Workers.
 
+## Publicidad
+
+Las etiquetas de la red viven en `src/components/Anuncios.astro` y se cargan en
+todas las páginas, al final del `body` y con `async`, para no bloquear el
+primer pintado. Hay `dns-prefetch` a sus dominios para que arranquen antes.
+
+Se apagan con la variable de entorno `ANUNCIOS=0`, útil en desarrollo y para
+medir el rendimiento del sitio sin ellas.
+
 ## Estructura
 
 ```
