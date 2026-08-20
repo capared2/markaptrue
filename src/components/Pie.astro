@@ -1,6 +1,7 @@
 ---
 import type { Indice } from "../lib/types";
 import { fecha } from "../lib/format";
+import { SITIO } from "../lib/sitio";
 
 interface Props {
   indice: Indice | null;
@@ -12,7 +13,7 @@ const { indice } = Astro.props;
   <div
     class="contenedor flex flex-wrap items-baseline gap-x-2 gap-y-1 py-5 text-[0.7rem] leading-relaxed text-[var(--color-tinta-tenue)]"
   >
-    <span class="font-semibold tracking-wide text-[var(--color-tinta-suave)]">markap</span>
+    <span class="font-semibold tracking-wide text-[var(--color-tinta-suave)]">{SITIO.nombre}</span>
     <span aria-hidden="true">·</span>
     <span>
       Agregador de noticias. Cada una enlaza a su publicación original, cuyos

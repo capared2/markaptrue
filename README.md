@@ -1,6 +1,6 @@
-# markaptrue — markap, agregador de noticias deportivas
+# jomperr — agregador de noticias deportivas
 
-Frontend de **markap**: reúne noticias de la prensa deportiva, las ordena por
+Frontend de **jomperr.com**: reúne noticias de la prensa deportiva, las ordena por
 categoría y enlaza cada una a su publicación original.
 
 Hecho con **Astro 7 + TypeScript + Tailwind 4**, renderizado en el servidor
@@ -99,6 +99,50 @@ Todo enlace que apunte fuera del sitio lleva `rel="nofollow noopener noreferrer"
 ninguno transmite autoridad. Si añades enlaces externos nuevos, mantén ese
 `rel`.
 
+## SEO, AEO y GEO
+
+Todo se genera solo a partir del dataset; no hay nada que mantener a mano.
+
+**Metadatos** — `src/components/Seo.astro` pone en cada página título y
+descripción propios, canónica absoluta, Open Graph, Twitter Card y directivas
+`max-snippet:-1` / `max-image-preview:large`, que son las que hacen que el
+resultado ocupe más espacio en la página de búsqueda. Las listadas paginadas
+declaran `rel="prev"` y `rel="next"`; el buscador interno va `noindex` para no
+generar URLs infinitas sin valor.
+
+**Datos estructurados** — un solo `@graph` de schema.org por página:
+
+| Página | Bloques |
+| --- | --- |
+| Portada | `Organization`, `WebSite` (con `SearchAction`), `CollectionPage` + `ItemList` |
+| Categoría | los anteriores, más `BreadcrumbList` y su `ItemList` |
+| Noticia | `NewsArticle` completo (autores, fechas, sección, `wordCount`, imágenes) + `BreadcrumbList` |
+
+**AEO** — el `NewsArticle` incluye `speakable`, que le dice a los asistentes de
+voz qué leer en alto; el `SearchAction` habilita la caja de búsqueda en Google;
+las migas dan a los buscadores la jerarquía exacta de cada noticia.
+
+**GEO** — `robots.txt` deja pasar explícitamente a los rastreadores de los
+asistentes (GPTBot, ClaudeBot, PerplexityBot, Google-Extended y compañía), y
+`/llms.txt` resume en texto plano qué es el sitio, cómo está organizado y cómo
+citarlo, para que un modelo lo entienda sin rastrearlo entero.
+
+**Rutas generadas**
+
+| Ruta | Qué es |
+| --- | --- |
+| `/robots.txt` | Permisos y enlaces a los sitemaps |
+| `/sitemap.xml` | Índice de sitemaps |
+| `/sitemap-secciones.xml` | Portada, directorio y categorías |
+| `/sitemap-noticias-NNNN.xml` | Todas las noticias |
+| `/sitemap-news.xml` | Google News: últimas 48 h |
+| `/rss.xml` | Los 50 titulares más recientes |
+| `/llms.txt` | Resumen del sitio para modelos de lenguaje |
+
+Los sitemaps los produce el proceso de recolección y aquí solo se sirven, sin
+parsearlos: construirlos en cada petición no cabría en los 10 ms de CPU del
+plan gratuito de Workers.
+
 ## Estructura
 
 ```
@@ -117,7 +161,7 @@ src/
 
 ## Aviso
 
-markap es un agregador: reúne y ordena noticias publicadas por medios
+jomperr es un agregador: reúne y ordena noticias publicadas por medios
 deportivos, y cada una enlaza a su publicación original. Los derechos de cada
-noticia pertenecen al medio que la publicó; markap no está afiliado a ninguno
+noticia pertenecen al medio que la publicó; jomperr no está afiliado a ninguno
 de ellos.

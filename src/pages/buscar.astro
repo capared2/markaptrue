@@ -4,6 +4,7 @@ import Rejilla from "../components/Rejilla.astro";
 import Vacio from "../components/Vacio.astro";
 import { obtenerIndice, obtenerPortada } from "../lib/data";
 import { numero } from "../lib/format";
+import { SITIO } from "../lib/sitio";
 
 const consulta = (Astro.url.searchParams.get("q") ?? "").trim();
 
@@ -30,9 +31,12 @@ const resultados = !terminos.length
 ---
 
 <Base
-  titulo={consulta ? `«${consulta}» · markap` : "Buscar · markap"}
+  titulo={consulta ? `Resultados para «${consulta}» | ${SITIO.nombre}` : `Buscar noticias | ${SITIO.nombre}`}
+  descripcion={`Busca entre las noticias deportivas más recientes de ${SITIO.nombre}.`}
+  canonical="/buscar"
   indice={indice}
   cache={300}
+  noindex
 >
   <header class="mb-6">
     <p class="text-xs font-bold uppercase tracking-widest text-[var(--color-marca)]">Búsqueda</p>

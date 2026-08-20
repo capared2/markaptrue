@@ -1,6 +1,8 @@
 ---
 import type { Indice } from "../lib/types";
 import { enlaceCategoria, etiquetaCategoria, nombreCategoria } from "../lib/format";
+import { SITIO } from "../lib/sitio";
+import Logo from "./Logo.astro";
 
 interface Props {
   indice: Indice | null;
@@ -26,14 +28,18 @@ const principales = [...new Set((indice?.categories ?? []).map((c) => c.category
   class="sticky top-0 z-20 border-b border-[var(--color-linea)] bg-[var(--color-lienzo)]/95 backdrop-blur"
 >
   <div class="contenedor flex items-center gap-4 py-3">
-    <a href="/" class="flex shrink-0 items-center gap-2" aria-label="markap, inicio">
-      <span class="grid size-8 place-items-center rounded-md bg-[var(--color-marca)] text-lg font-bold text-white">
-        m
-      </span>
+    <a
+      href="/"
+      class="flex shrink-0 items-center gap-2"
+      aria-label={`${SITIO.nombre}, ir a la portada`}
+    >
+      <Logo clase="size-8 text-[var(--color-marca)]" />
       <span class="flex flex-col leading-none">
-        <strong class="font-display text-2xl font-extrabold uppercase leading-none tracking-tight">markap</strong>
+        <strong class="font-display text-2xl font-extrabold lowercase leading-none tracking-tight">
+          {SITIO.nombre}
+        </strong>
         <small class="text-[0.65rem] uppercase tracking-widest text-[var(--color-tinta-tenue)]">
-          agregador de noticias
+          {SITIO.lema}
         </small>
       </span>
     </a>

@@ -5,6 +5,8 @@ import Rejilla from "../../components/Rejilla.astro";
 import Vacio from "../../components/Vacio.astro";
 import { obtenerIndice, obtenerPaginaCategoria } from "../../lib/data";
 import { enlaceCategoria, nombreCategoria, numero } from "../../lib/format";
+import { SITIO } from "../../lib/sitio";
+import { grafoCategoria } from "../../lib/seo";
 
 const POR_PAGINA = 24;
 
@@ -20,13 +22,18 @@ const solicitada = Number(Astro.url.searchParams.get("p") ?? "1");
 const pagina = await obtenerPaginaCategoria(entrada, Number.isFinite(solicitada) ? solicitada : 1, POR_PAGINA);
 
 const nombre = nombreCategoria(clave);
+const sufijo = pagina.pagina > 1 ? ` (página ${pagina.pagina})` : "";
 ---
 
 <Base
-  titulo={`${nombre} · markap`}
-  descripcion={`Últimas noticias de ${nombre} reunidas de la prensa deportiva.`}
+  titulo={`${nombre}: últimas noticias${sufijo} | ${SITIO.nombre}`}
+  descripcion={`Toda la actualidad de ${nombre}: ${numero(pagina.total)} noticias reunidas de la prensa deportiva y ordenadas de la más reciente a la más antigua.`}
+  canonical={enlaceCategoria(clave, pagina.pagina)}
   indice={indice}
   categoriaActiva={clave}
+  anterior={pagina.pagina > 1 ? enlaceCategoria(clave, pagina.pagina - 1) : null}
+  siguiente={pagina.pagina < pagina.paginas ? enlaceCategoria(clave, pagina.pagina + 1) : null}
+  jsonLd={grafoCategoria(clave, nombre, pagina.articulos, pagina.pagina)}
 >
   <div class="grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)]">
     <aside class="lg:sticky lg:top-28 lg:self-start">

@@ -7,6 +7,7 @@ import tailwindcss from "@tailwindcss/vite";
 // prerenderizar una pagina por noticia chocaria con el tope de ficheros de
 // Cloudflare Pages. Cada respuesta se cachea en el edge (ver Base.astro).
 export default defineConfig({
+  site: "https://jomperr.com",
   output: "server",
   adapter: cloudflare({ imageService: "passthrough" }),
   vite: { plugins: [tailwindcss()] },

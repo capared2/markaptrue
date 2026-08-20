@@ -2,11 +2,18 @@
 import Base from "../layouts/Base.astro";
 import Vacio from "../components/Vacio.astro";
 import { obtenerIndice } from "../lib/data";
+import { SITIO } from "../lib/sitio";
 
 const indice = await obtenerIndice();
 ---
 
-<Base titulo="Página no encontrada · markap" indice={indice} cache={3600}>
+<Base
+  titulo={`Página no encontrada | ${SITIO.nombre}`}
+  canonical="/404"
+  indice={indice}
+  cache={3600}
+  noindex
+>
   <Vacio
     titulo="Esta página no existe"
     detalle="Puede que esa noticia ya no esté disponible. Vuelve a la portada o entra por categoría."

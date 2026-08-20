@@ -2,23 +2,40 @@
 import "../styles/global.css";
 import Cabecera from "../components/Cabecera.astro";
 import Pie from "../components/Pie.astro";
+import Seo from "../components/Seo.astro";
 import type { Indice } from "../lib/types";
+import { SITIO } from "../lib/sitio";
 
 interface Props {
   titulo: string;
   descripcion?: string;
+  /** Ruta canónica de esta página. */
+  canonical: string;
   indice: Indice | null;
   /** Segundos que el edge de Cloudflare puede reutilizar la respuesta. */
   cache?: number;
   categoriaActiva?: string;
+  imagen?: string | null;
+  tipo?: "website" | "article";
+  publicado?: string | null;
+  modificado?: string | null;
+  autores?: string[];
+  seccion?: string;
+  etiquetas?: string[];
+  noindex?: boolean;
+  jsonLd?: object[];
+  anterior?: string | null;
+  siguiente?: string | null;
 }
 
 const {
   titulo,
-  descripcion = "Agregador de noticias deportivas: los titulares del día reunidos y ordenados por categoría.",
+  descripcion = SITIO.descripcion,
+  canonical,
   indice,
   cache = 900,
   categoriaActiva,
+  ...seo
 } = Astro.props;
 
 // El dataset se regenera cada dos horas: servir desde el edge y revalidar en
@@ -34,22 +51,18 @@ Astro.response.headers.set(
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{titulo}</title>
-    <meta name="description" content={descripcion} />
-    <meta property="og:title" content={titulo} />
-    <meta property="og:description" content={descripcion} />
-    <meta property="og:type" content="website" />
-    <meta name="robots" content="noindex, follow" />
+    <Seo titulo={titulo} descripcion={descripcion} canonical={canonical} {...seo} />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
       rel="stylesheet"
     />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23d8232a'/><text x='50' y='72' font-size='62' font-family='Helvetica,Arial' font-weight='bold' fill='white' text-anchor='middle'>m</text></svg>"
-    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#d8232a" />
+
     <script is:inline>
       // Las fotos las sirve cada medio de origen: si alguna desaparece, se
       // oculta en vez de mostrar el icono de imagen rota.

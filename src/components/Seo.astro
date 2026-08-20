@@ -1,0 +1,84 @@
+---
+import { SITIO, absoluta } from "../lib/sitio";
+import { grafo } from "../lib/seo";
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  /** Ruta canónica del sitio; se convierte a absoluta. */
+  canonical: string;
+  imagen?: string | null;
+  tipo?: "website" | "article";
+  publicado?: string | null;
+  modificado?: string | null;
+  autores?: string[];
+  seccion?: string;
+  etiquetas?: string[];
+  noindex?: boolean;
+  jsonLd?: object[];
+  anterior?: string | null;
+  siguiente?: string | null;
+}
+
+const {
+  titulo,
+  descripcion,
+  canonical,
+  imagen = null,
+  tipo = "website",
+  publicado = null,
+  modificado = null,
+  autores = [],
+  seccion,
+  etiquetas = [],
+  noindex = false,
+  jsonLd = [],
+  anterior = null,
+  siguiente = null,
+} = Astro.props;
+
+const url = absoluta(canonical);
+const portada = imagen ?? absoluta("/og.svg");
+
+// Sin límites al fragmento ni a la imagen: es lo que hace que el resultado
+// ocupe más espacio y se lleve más clics.
+const robots = noindex
+  ? "noindex, follow"
+  : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1";
+---
+
+<title>{titulo}</title>
+<meta name="description" content={descripcion} />
+<link rel="canonical" href={url} />
+
+<meta name="robots" content={robots} />
+<meta name="googlebot" content={robots} />
+<meta name="googlebot-news" content={robots} />
+
+{anterior && <link rel="prev" href={absoluta(anterior)} />}
+{siguiente && <link rel="next" href={absoluta(siguiente)} />}
+
+<meta property="og:type" content={tipo} />
+<meta property="og:site_name" content={SITIO.nombre} />
+<meta property="og:locale" content={SITIO.locale} />
+<meta property="og:title" content={titulo} />
+<meta property="og:description" content={descripcion} />
+<meta property="og:url" content={url} />
+<meta property="og:image" content={portada} />
+<meta property="og:image:alt" content={titulo} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={titulo} />
+<meta name="twitter:description" content={descripcion} />
+<meta name="twitter:image" content={portada} />
+
+{tipo === "article" && publicado && <meta property="article:published_time" content={publicado} />}
+{tipo === "article" && modificado && <meta property="article:modified_time" content={modificado} />}
+{tipo === "article" && seccion && <meta property="article:section" content={seccion} />}
+{tipo === "article" && autores.map((a) => <meta property="article:author" content={a} />)}
+{tipo === "article" && etiquetas.slice(0, 10).map((t) => <meta property="article:tag" content={t} />)}
+
+<link rel="alternate" type="application/rss+xml" title={`${SITIO.nombre} · últimas noticias`} href={absoluta("/rss.xml")} />
+<link rel="sitemap" type="application/xml" href={absoluta("/sitemap.xml")} />
+
+{jsonLd.length > 0 && <script type="application/ld+json" is:inline set:html={grafo(jsonLd)} />}

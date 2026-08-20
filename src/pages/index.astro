@@ -7,6 +7,8 @@ import Seccion from "../components/Seccion.astro";
 import Vacio from "../components/Vacio.astro";
 import { obtenerIndice, obtenerPortada } from "../lib/data";
 import { fecha, fechaLarga, numero } from "../lib/format";
+import { SITIO } from "../lib/sitio";
+import { grafoPortada } from "../lib/seo";
 import type { Tarjeta as TipoTarjeta } from "../lib/types";
 
 const [indice, portada] = await Promise.all([
@@ -54,7 +56,18 @@ const sueltas = candidatas
 const hoy = fechaLarga(new Date());
 ---
 
-<Base titulo="markap · agregador de noticias deportivas" indice={indice} cache={600}>
+<Base
+  titulo={`Noticias deportivas de última hora — ${hoy} | ${SITIO.nombre}`}
+  descripcion={
+    indice
+      ? `${numero(indice.total_articles)} noticias deportivas reunidas y ordenadas por categoría: fútbol, baloncesto, motor, tenis y más. Actualizado ${fecha(indice.generated_at, true)}.`
+      : SITIO.descripcion
+  }
+  canonical="/"
+  indice={indice}
+  cache={600}
+  jsonLd={grafoPortada(articulos)}
+>
   <div class="mb-6 flex flex-wrap items-baseline justify-between gap-2 border-b border-[var(--color-linea)] pb-3">
     <h1 class="font-display text-4xl font-extrabold uppercase tracking-tight">Portada</h1>
     <p class="text-sm text-[var(--color-tinta-tenue)]">

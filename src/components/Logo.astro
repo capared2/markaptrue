@@ -1,0 +1,38 @@
+---
+/**
+ * Lupa de jomperr.
+ *
+ * Trazado geométrico: circunferencia de radio 9 centrada en (13,13) y mango
+ * en la diagonal exacta a 45°, de modo que el conjunto se apoya en una sola
+ * línea de fuerza. El destello es un arco corto del mismo círculo, con la
+ * lente rellena para que la marca lea bien a 16 px de favicon.
+ */
+interface Props {
+  clase?: string;
+  titulo?: string;
+}
+const { clase = "size-8", titulo } = Astro.props;
+---
+
+<svg
+  class={clase}
+  viewBox="0 0 32 32"
+  fill="none"
+  role={titulo ? "img" : "presentation"}
+  aria-hidden={titulo ? undefined : "true"}
+  aria-label={titulo}
+>
+  <circle cx="13" cy="13" r="11.5" fill="currentColor" opacity="0.12"></circle>
+  <circle cx="13" cy="13" r="9" stroke="currentColor" stroke-width="2.75"></circle>
+  <path
+    d="M8.4 9.6a6.5 6.5 0 0 1 4.6-2.6"
+    stroke="currentColor"
+    stroke-width="1.75"
+    stroke-linecap="round"
+    opacity="0.55"></path>
+  <path
+    d="M19.9 19.9 28 28"
+    stroke="currentColor"
+    stroke-width="3.25"
+    stroke-linecap="round"></path>
+</svg>

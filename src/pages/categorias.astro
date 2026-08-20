@@ -3,11 +3,20 @@ import Base from "../layouts/Base.astro";
 import Barra from "../components/Barra.astro";
 import { obtenerIndice } from "../lib/data";
 import { numero } from "../lib/format";
+import { SITIO } from "../lib/sitio";
+import { grafoCategorias } from "../lib/seo";
 
 const indice = await obtenerIndice();
 ---
 
-<Base titulo="Categorías · markap" indice={indice} cache={3600}>
+<Base
+  titulo={`Todas las categorías de noticias deportivas | ${SITIO.nombre}`}
+  descripcion={`Directorio completo: ${indice ? numero(indice.total_categories) : ""} categorías de noticias deportivas, de fútbol y baloncesto a motor, tenis y ciclismo.`}
+  canonical="/categorias"
+  indice={indice}
+  cache={3600}
+  jsonLd={grafoCategorias(indice)}
+>
   <header class="mb-6 border-b border-[var(--color-linea)] pb-3">
     <h1 class="font-display text-4xl font-extrabold uppercase tracking-tight">Categorías</h1>
     <p class="mt-1 text-sm text-[var(--color-tinta-tenue)]">

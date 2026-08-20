@@ -2,7 +2,9 @@
 import Base from "../../layouts/Base.astro";
 import Tarjeta from "../../components/Tarjeta.astro";
 import { obtenerIndice, obtenerNoticia, obtenerRelacionadas } from "../../lib/data";
-import { enlaceCategoria, fecha, nombreCategoria } from "../../lib/format";
+import { enlaceCategoria, enlaceNoticia, fecha, nombreCategoria } from "../../lib/format";
+import { SITIO } from "../../lib/sitio";
+import { grafoNoticia } from "../../lib/seo";
 
 // La ruta es /noticia/<categoria con barras>/<id>
 const ruta = (Astro.params.ruta ?? "").split("/").filter(Boolean);
@@ -24,15 +26,25 @@ if (!noticia) {
 
 const relacionadas = await obtenerRelacionadas(noticia);
 const portada = noticia.images?.[0];
+const resumen = (noticia.summary || noticia.standfirst || noticia.paragraphs[0] || "").slice(0, 200);
 const galeria = (noticia.images ?? []).slice(1, 5);
 ---
 
 <Base
-  titulo={`${noticia.title} · markap`}
-  descripcion={noticia.summary || noticia.standfirst}
+  titulo={`${noticia.title} | ${SITIO.nombre}`}
+  descripcion={resumen}
+  canonical={enlaceNoticia(noticia.category, noticia.id)}
   indice={indice}
   categoriaActiva={noticia.category}
   cache={86400}
+  tipo="article"
+  imagen={portada?.url ?? null}
+  publicado={noticia.published_at}
+  modificado={noticia.modified_at}
+  autores={noticia.authors}
+  seccion={nombreCategoria(noticia.category)}
+  etiquetas={noticia.tags}
+  jsonLd={grafoNoticia(noticia)}
 >
   <article class="mx-auto max-w-3xl">
     <a
@@ -48,7 +60,9 @@ const galeria = (noticia.images ?? []).slice(1, 5);
 
     {
       noticia.standfirst && (
-        <p class="mt-3 font-serif text-lg text-[var(--color-tinta-suave)]">{noticia.standfirst}</p>
+        <p class="entradilla mt-3 font-serif text-lg text-[var(--color-tinta-suave)]">
+          {noticia.standfirst}
+        </p>
       )
     }
 
