@@ -36,11 +36,11 @@ const sufijo = pagina.pagina > 1 ? ` (página ${pagina.pagina})` : "";
   jsonLd={grafoCategoria(clave, nombre, pagina.articulos, pagina.pagina)}
 >
   <div class="grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)]">
-    <aside class="lg:sticky lg:top-28 lg:self-start">
+    <aside class="order-2 lg:order-1 lg:sticky lg:top-28 lg:self-start">
       <Barra indice={indice} activa={clave} />
     </aside>
 
-    <div>
+    <div class="order-1 lg:order-2">
       <header class="mb-6">
         <p class="text-xs font-bold uppercase tracking-widest text-[var(--color-marca)]">Categoría</p>
         <h1 class="mt-1 font-display text-4xl font-extrabold uppercase tracking-tight">{nombre}</h1>

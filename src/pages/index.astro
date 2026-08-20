@@ -44,10 +44,16 @@ const candidatas = [...porSeccion.entries()].map(([clave, lista]) => ({
   total: totales.get(clave) ?? 0,
 }));
 
+// Un máximo de bandas: con todas las secciones la portada se iba a más de
+// 30.000 px en móvil, que nadie recorre. El resto está a un toque en su
+// categoría.
+const MAX_BANDAS = 8;
+
 const bandas = candidatas
   .filter((banda) => banda.lista.length >= 2)
   .map((banda) => ({ ...banda, lista: banda.lista.slice(0, 4) }))
-  .sort((a, b) => b.lista.length - a.lista.length || b.total - a.total);
+  .sort((a, b) => b.lista.length - a.lista.length || b.total - a.total)
+  .slice(0, MAX_BANDAS);
 
 const sueltas = candidatas
   .filter((banda) => banda.lista.length < 2)

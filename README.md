@@ -159,6 +159,26 @@ pintada la página, para que no compitan con el contenido.
 Se apagan con la variable de entorno `ANUNCIOS=0`, útil en desarrollo y para
 medir el rendimiento del sitio sin ellas.
 
+## Navegación y móvil
+
+El sitio se diseñó para que en un teléfono se llegue al contenido de
+inmediato, no después de recorrer la navegación:
+
+- **La lista completa de categorías va plegada en móvil** y desplegada en
+  escritorio. Con 255 categorías, dejarla abierta ponía 10.000 px por delante
+  de la primera noticia.
+- **En las páginas de categoría el contenido va primero** en móvil y la barra
+  lateral después; en escritorio se mantiene la barra a la izquierda.
+- **La sección activa se centra sola** en la barra horizontal de secciones al
+  cargar, para que nunca quede fuera de la parte visible.
+- **El buscador ocupa su propia fila** en pantallas pequeñas: encajado junto al
+  logo aplastaba el campo y empujaba el botón de tema fuera de la pantalla.
+- La portada muestra como mucho 8 bandas de sección; con todas se iba a más de
+  30.000 px en móvil.
+
+Comprobado a 360, 412, 768 y 1400 px: sin desbordes horizontales y con los
+controles de la cabecera siempre dentro de la pantalla.
+
 ## Estructura
 
 ```

@@ -27,8 +27,30 @@ const ordenados = [...grupos.entries()]
   .sort((a, b) => b.total - a.total);
 ---
 
-<nav aria-label="Todas las categorías" class="text-sm">
-  <h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-[var(--color-tinta-tenue)]">
+<!--
+  En móvil la lista completa son miles de píxeles por delante del contenido,
+  así que va plegada: se abre solo si alguien la quiere. En escritorio es la
+  barra lateral de siempre, desplegada.
+-->
+<details
+  open
+  data-barra-categorias
+  class="text-sm [&>summary]:lg:hidden"
+  aria-label="Todas las categorías"
+>
+  <summary
+    class="mb-3 flex cursor-pointer list-none items-center justify-between gap-2 rounded-lg border border-[var(--color-linea)] px-3 py-2 font-semibold marker:content-none"
+  >
+    <span class="text-xs uppercase tracking-widest text-[var(--color-tinta-tenue)]">
+      Todas las categorías
+    </span>
+    <svg class="size-4 shrink-0 transition-transform [details[open]_&]:rotate-180" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <path d="m6 9 6 6 6-6"></path>
+    </svg>
+  </summary>
+
+  <h2 class="mb-3 hidden text-xs font-semibold uppercase tracking-widest text-[var(--color-tinta-tenue)] lg:block">
     Categorías
   </h2>
 
@@ -38,6 +60,7 @@ const ordenados = [...grupos.entries()]
         <div>
           <a
             href={enlaceCategoria(raiz)}
+            aria-current={activa === raiz ? "page" : undefined}
             class:list={[
               "flex items-baseline justify-between gap-2 rounded px-2 py-1 font-bold",
               activa === raiz
@@ -56,6 +79,7 @@ const ordenados = [...grupos.entries()]
             .map((hijo) => (
               <a
                 href={enlaceCategoria(hijo.clave)}
+                aria-current={activa === hijo.clave ? "page" : undefined}
                 class:list={[
                   "flex items-baseline justify-between gap-2 rounded py-1 pl-4 pr-2",
                   activa === hijo.clave
@@ -73,4 +97,13 @@ const ordenados = [...grupos.entries()]
       ))
     }
   </div>
-</nav>
+</details>
+
+<script is:inline>
+  // Plegada en móvil, abierta en escritorio. Se hace aquí y no con CSS porque
+  // el navegador oculta el contenido de <details> por su cuenta.
+  (function () {
+    var barra = document.querySelector("[data-barra-categorias]");
+    if (barra && window.matchMedia("(max-width: 1023px)").matches) barra.open = false;
+  })();
+</script>

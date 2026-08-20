@@ -27,7 +27,7 @@ const principales = [...new Set((indice?.categories ?? []).map((c) => c.category
 <header
   class="sticky top-0 z-20 border-b border-[var(--color-linea)] bg-[var(--color-lienzo)]/95 backdrop-blur"
 >
-  <div class="contenedor flex items-center gap-4 py-3">
+  <div class="contenedor flex flex-wrap items-center gap-x-3 gap-y-2 py-3">
     <a
       href="/"
       class="flex shrink-0 items-center gap-2"
@@ -44,7 +44,14 @@ const principales = [...new Set((indice?.categories ?? []).map((c) => c.category
       </span>
     </a>
 
-    <form action="/buscar" method="get" role="search" class="ml-auto w-full max-w-sm">
+    <!-- En móvil el buscador va en su propia fila: encajado en la primera
+         aplastaba el campo y empujaba el botón de tema fuera de la pantalla. -->
+    <form
+      action="/buscar"
+      method="get"
+      role="search"
+      class="order-last w-full basis-full sm:order-none sm:ml-auto sm:w-auto sm:max-w-sm sm:flex-1 sm:basis-auto"
+    >
       <label for="q" class="sr-only">Buscar noticias</label>
       <div class="relative">
         <svg
@@ -83,11 +90,16 @@ const principales = [...new Set((indice?.categories ?? []).map((c) => c.category
 
   {
     principales.length > 0 && (
-      <nav aria-label="Secciones" class="contenedor flex gap-1 overflow-x-auto pb-2 text-sm">
+      <nav
+        aria-label="Secciones"
+        data-secciones
+        class="contenedor flex snap-x snap-mandatory gap-1 overflow-x-auto pb-2 text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
         <a
           href="/"
+          aria-current={!categoriaActiva ? "page" : undefined}
           class:list={[
-            "shrink-0 rounded-full px-3 py-1 font-semibold",
+            "shrink-0 scroll-mx-4 snap-start rounded-full px-3 py-1 font-semibold",
             !categoriaActiva
               ? "bg-[var(--color-marca)] text-white"
               : "text-[var(--color-tinta-suave)] hover:bg-[var(--color-lienzo-alt)]",
@@ -99,8 +111,11 @@ const principales = [...new Set((indice?.categories ?? []).map((c) => c.category
           <a
             href={enlaceCategoria(raiz)}
             title={nombreCategoria(raiz)}
+            aria-current={
+              categoriaActiva === raiz || categoriaActiva?.startsWith(`${raiz}/`) ? "page" : undefined
+            }
             class:list={[
-              "shrink-0 rounded-full px-3 py-1 font-semibold",
+              "shrink-0 scroll-mx-4 snap-start rounded-full px-3 py-1 font-semibold",
               categoriaActiva === raiz || categoriaActiva?.startsWith(`${raiz}/`)
                 ? "bg-[var(--color-marca)] text-white"
                 : "text-[var(--color-tinta-suave)] hover:bg-[var(--color-lienzo-alt)]",
@@ -115,6 +130,16 @@ const principales = [...new Set((indice?.categories ?? []).map((c) => c.category
 </header>
 
 <script is:inline>
+  // La sección en la que estás puede quedar fuera de la parte visible de la
+  // barra: se centra sola al cargar, sin arrastrar la página.
+  (function () {
+    var barra = document.querySelector("[data-secciones]");
+    var activa = barra && barra.querySelector('[aria-current="page"]');
+    if (!activa) return;
+    var centro = activa.offsetLeft - (barra.clientWidth - activa.clientWidth) / 2;
+    barra.scrollTo({ left: Math.max(0, centro), behavior: "instant" in document.body.style ? "instant" : "auto" });
+  })();
+
   document.getElementById("cambiar-tema")?.addEventListener("click", () => {
     const oscuro = document.documentElement.classList.toggle("oscuro");
     localStorage.setItem("tema", oscuro ? "oscuro" : "claro");
