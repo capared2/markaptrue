@@ -1,6 +1,6 @@
 ---
 import type { Indice } from "../lib/types";
-import { fecha, numero } from "../lib/format";
+import { fecha } from "../lib/format";
 
 interface Props {
   indice: Indice | null;
@@ -8,23 +8,22 @@ interface Props {
 const { indice } = Astro.props;
 ---
 
-<footer class="mt-8 border-t border-[var(--color-linea)] bg-[var(--color-lienzo)]">
-  <div class="contenedor py-6">
+<footer class="mt-10 border-t border-[var(--color-linea)]">
+  <div
+    class="contenedor flex flex-wrap items-baseline gap-x-2 gap-y-1 py-5 text-[0.7rem] leading-relaxed text-[var(--color-tinta-tenue)]"
+  >
+    <span class="font-semibold tracking-wide text-[var(--color-tinta-suave)]">markap</span>
+    <span aria-hidden="true">·</span>
+    <span>
+      Agregador de noticias. Cada una enlaza a su publicación original, cuyos
+      derechos pertenecen al medio que la publicó.
+    </span>
     {
       indice && (
-        <p class="mb-2 text-sm font-semibold">
-          {numero(indice.total_articles)} noticias en {numero(indice.total_categories)} categorías
-          <span class="font-normal text-[var(--color-tinta-tenue)]">
-            · actualizado el {fecha(indice.generated_at, true)}
-          </span>
-        </p>
+        <time class="w-full sm:ms-auto sm:w-auto whitespace-nowrap" datetime={indice.generated_at}>
+          Actualizado {fecha(indice.generated_at, true)}
+        </time>
       )
     }
-    <p class="max-w-[65ch] text-xs leading-relaxed text-[var(--color-tinta-tenue)]">
-      markap es un agregador: reúne y ordena noticias publicadas por medios
-      deportivos, y cada una enlaza a su publicación original. Los derechos de
-      cada noticia pertenecen al medio que la publicó; markap no está afiliado
-      a ninguno de ellos.
-    </p>
   </div>
 </footer>
