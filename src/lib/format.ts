@@ -106,7 +106,6 @@ const ACENTOS: Record<string, string> = {
   pe: "Perú",
   ve: "Venezuela",
   "claro-sports": "Claro Sports",
-  "combates-ufc": "Combates / UFC",
 };
 
 // Palabras que no llevan mayuscula dentro de un nombre de seccion.
