@@ -6,7 +6,14 @@ import { obtenerIndice, obtenerPortada } from "../lib/data";
 import { numero } from "../lib/format";
 import { SITIO } from "../lib/sitio";
 
-const consulta = (Astro.url.searchParams.get("q") ?? "").trim();
+// La consulta se enseña de vuelta y viaja en las etiquetas Open Graph. Astro
+// escapa los atributos, así que no hay inyección, pero sin quitar los signos de
+// menor y mayor cualquiera podría fabricar un enlace cuya vista previa en redes
+// dijera lo que le diera la gana.
+const consulta = (Astro.url.searchParams.get("q") ?? "")
+  .replace(/[<>]/g, " ")
+  .trim()
+  .slice(0, 80);
 
 const [indice, portada] = await Promise.all([
   obtenerIndice(),

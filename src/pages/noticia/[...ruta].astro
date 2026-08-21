@@ -43,6 +43,7 @@ const galeria = (noticia.images ?? []).slice(1, 5);
   descripcion={resumen}
   canonical={enlaceNoticia(noticia.category, noticia.id)}
   indice={indice}
+  idioma={noticia.language || undefined}
   categoriaActiva={noticia.category}
   cache={86400}
   tipo="article"

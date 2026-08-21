@@ -15,6 +15,8 @@ interface Props {
   seccion?: string;
   etiquetas?: string[];
   noindex?: boolean;
+  /** Idioma de la página; de él sale también el og:locale. */
+  idioma?: string;
   jsonLd?: object[];
   anterior?: string | null;
   siguiente?: string | null;
@@ -32,13 +34,17 @@ const {
   seccion,
   etiquetas = [],
   noindex = false,
+  idioma = SITIO.idioma,
   jsonLd = [],
   anterior = null,
   siguiente = null,
 } = Astro.props;
 
 const url = absoluta(canonical);
-const portada = imagen ?? absoluta("/og.svg");
+// En PNG y no en SVG: ni Facebook, ni X, ni LinkedIn, ni WhatsApp pintan un
+// SVG en la vista previa, y el enlace se comparte sin imagen.
+const portada = imagen ?? absoluta("/og.png");
+const portadaPropia = !imagen;
 
 // Sin límites al fragmento ni a la imagen: es lo que hace que el resultado
 // ocupe más espacio y se lleve más clics.
@@ -60,12 +66,15 @@ const robots = noindex
 
 <meta property="og:type" content={tipo} />
 <meta property="og:site_name" content={SITIO.nombre} />
-<meta property="og:locale" content={SITIO.locale} />
+<meta property="og:locale" content={idioma === SITIO.idioma ? SITIO.locale : idioma.replace("-", "_")} />
 <meta property="og:title" content={titulo} />
 <meta property="og:description" content={descripcion} />
 <meta property="og:url" content={url} />
 <meta property="og:image" content={portada} />
 <meta property="og:image:alt" content={titulo} />
+{portadaPropia && <meta property="og:image:type" content="image/png" />}
+{portadaPropia && <meta property="og:image:width" content="1200" />}
+{portadaPropia && <meta property="og:image:height" content="630" />}
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={titulo} />

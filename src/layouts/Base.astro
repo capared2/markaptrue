@@ -15,6 +15,11 @@ interface Props {
   indice: Indice | null;
   /** Segundos que el edge de Cloudflare puede reutilizar la respuesta. */
   cache?: number;
+  /** Idioma de esta página. El archivo trae noticias de las ediciones en
+      inglés de los medios, y declararlas como españolas confunde a los
+      buscadores y hace que un lector de pantalla las lea con fonética
+      equivocada. */
+  idioma?: string;
   categoriaActiva?: string;
   imagen?: string | null;
   tipo?: "website" | "article";
@@ -35,6 +40,7 @@ const {
   canonical,
   indice,
   cache = 900,
+  idioma = SITIO.idioma,
   categoriaActiva,
   ...seo
 } = Astro.props;
@@ -48,11 +54,11 @@ Astro.response.headers.set(
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang={idioma}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <Seo titulo={titulo} descripcion={descripcion} canonical={canonical} {...seo} />
+    <Seo titulo={titulo} descripcion={descripcion} canonical={canonical} idioma={idioma} {...seo} />
 
     <link rel="dns-prefetch" href="https://www.highperformanceformat.com" />
     <link rel="dns-prefetch" href="https://pl30939588.effectivecpmnetwork.com" />
