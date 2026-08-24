@@ -20,7 +20,11 @@ export const GET: APIRoute = async ({ params }) => {
     return new Response("No encontrado", { status: 404 });
   }
 
-  const respuesta = await fetch(`${BASE}/seo/${nombre}.xml`);
+  // El edge de Cloudflare guarda la respuesta de GitHub: los sitemaps los
+  // piden los buscadores una y otra vez, y siempre son los mismos.
+  const respuesta = await fetch(`${BASE}/seo/${nombre}.xml`, {
+    cf: { cacheTtl: 3600, cacheEverything: true },
+  } as RequestInit);
   if (!respuesta.ok) {
     return new Response("No encontrado", { status: 404 });
   }
