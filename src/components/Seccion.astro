@@ -1,5 +1,5 @@
 ---
-import { colorSeccion, enlaceCategoria, etiquetaCategoria } from "../lib/format";
+import { colorSeccion, enlaceCategoria, etiquetaCategoria, numero } from "../lib/format";
 
 interface Props {
   clave: string;
@@ -16,7 +16,7 @@ const color = colorSeccion(clave);
       {etiquetaCategoria(clave)}
     </h2>
     {total !== undefined && (
-      <span class="text-xs text-[var(--color-tinta-tenue)]">{total} noticias</span>
+      <span class="text-xs text-[var(--color-tinta-tenue)]">{numero(total)} noticias</span>
     )}
     <a
       href={enlaceCategoria(clave)}

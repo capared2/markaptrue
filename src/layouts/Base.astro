@@ -84,7 +84,13 @@ Astro.response.headers.set(
       );
 
       // Aplica el tema antes de pintar para que no haya destello.
-      const guardado = localStorage.getItem("tema");
+      // Leer localStorage lanza si el navegador tiene el almacenamiento
+      // bloqueado (modo privado, cookies denegadas): sin el try, quien lo
+      // tuviera asi se quedaba siempre en claro, aunque prefiriese oscuro.
+      let guardado = null;
+      try {
+        guardado = localStorage.getItem("tema");
+      } catch (e) {}
       const oscuro = guardado ? guardado === "oscuro" : matchMedia("(prefers-color-scheme: dark)").matches;
       document.documentElement.classList.toggle("oscuro", oscuro);
     </script>

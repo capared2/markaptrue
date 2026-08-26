@@ -144,6 +144,10 @@ const principales = [...new Set((indice?.categories ?? []).map((c) => c.category
 
   document.getElementById("cambiar-tema")?.addEventListener("click", () => {
     const oscuro = document.documentElement.classList.toggle("oscuro");
-    localStorage.setItem("tema", oscuro ? "oscuro" : "claro");
+    // Con el almacenamiento bloqueado el tema cambia igual, solo que no se
+    // recuerda al cambiar de pagina. Guardarlo sin red lanzaba en la consola.
+    try {
+      localStorage.setItem("tema", oscuro ? "oscuro" : "claro");
+    } catch (e) {}
   });
 </script>

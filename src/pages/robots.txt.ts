@@ -37,7 +37,16 @@ export const GET: APIRoute = () => {
     "Disallow: /buscar?",
     "",
     "# Rastreadores de asistentes y buscadores generativos: bienvenidos.",
-    ...RASTREADORES_IA.flatMap((agente) => [`User-agent: ${agente}`, "Allow: /", ""]),
+    // Un grupo propio anula el de `*` entero, asi que cada uno repite el
+    // cierre de /buscar. Sin el, los unicos que podian recorrer infinitas
+    // consultas eran justo estos -- y la busqueda es la unica pagina que el
+    // middleware no cachea, de modo que cada una se renderiza de verdad.
+    ...RASTREADORES_IA.flatMap((agente) => [
+      `User-agent: ${agente}`,
+      "Allow: /",
+      "Disallow: /buscar",
+      "",
+    ]),
     `Sitemap: ${absoluta("/sitemap.xml")}`,
     `Sitemap: ${absoluta("/sitemap-news.xml")}`,
     `Host: ${SITIO.dominio.replace("https://", "")}`,

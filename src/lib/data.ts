@@ -146,16 +146,18 @@ export async function obtenerPaginaCategoria(
  * de parseo, con un presupuesto de 10 ms de CPU por invocación. Ahora se
  * descarga el archivo más reciente de cada hija -- que es donde están sus
  * noticias nuevas, lo único que puede entrar en la primera página -- empezando
- * por las hijas con más fondo, y se para pronto:
+ * por las hijas con más fondo, y como mucho MAX_FICHEROS_AGREGADOS, que en el
+ * peor caso del dataset («mx», con dieciocho hijas) son 1,7 MB y unos 5 ms de
+ * parseo.
  *
- *  - al menos MIN_HIJAS archivos, para que la sección se vea como un agregado
- *    de verdad y no como una sola subsección;
- *  - como mucho MAX_FICHEROS_AGREGADOS, que en el peor caso del dataset («mx»)
- *    son 1,6 MB y unos 5 ms de parseo;
- *  - y se corta antes si ya hay noticias de sobra para la página pedida.
+ * Ese tope se aplica igual en todas las páginas, y no según la que se pida:
+ * cargar más archivos cuanto más hondo se navegaba hacía que el número de
+ * páginas cambiara solo al pasar de una a otra («página 1 de 8» y «página 5
+ * de 11» en la misma sección), y dejaba que `?p=200` respondiera «página 83
+ * de 11» con la lista vacía y esa misma canónica, indexable. Como el reparto
+ * de archivos ya no depende de la página, el recuento sale estable y basta
+ * con recortar la pedida a lo que de verdad hay.
  */
-const MARGEN_AGREGADO = 3;
-const MIN_HIJAS = 3;
 const MAX_FICHEROS_AGREGADOS = 4;
 
 export async function obtenerPaginaAgregada(
@@ -164,28 +166,15 @@ export async function obtenerPaginaAgregada(
   porPagina: number,
 ): Promise<PaginaCategoria> {
   const total = hijas.reduce((suma, c) => suma + c.articles, 0);
-  const paginas = Math.max(1, Math.ceil(total / porPagina));
-  const actual = Math.min(Math.max(1, pagina), paginas);
-
-  const necesarias = actual * porPagina * MARGEN_AGREGADO;
-  const minimo = Math.min(hijas.length, MIN_HIJAS);
 
   // El archivo más reciente de cada hija, las de más fondo primero.
-  const candidatos = [...hijas]
+  const ficheros = [...hijas]
     .sort((a, b) => b.articles - a.articles)
     .map((c) => ({ categoria: c.category, archivo: c.files.at(-1) }))
     .filter((c): c is { categoria: string; archivo: { file: string; count: number } } =>
       c.archivo !== undefined,
-    );
-
-  const ficheros: typeof candidatos = [];
-  let reunidas = 0;
-  for (const candidato of candidatos) {
-    if (ficheros.length >= MAX_FICHEROS_AGREGADOS) break;
-    if (ficheros.length >= minimo && reunidas >= necesarias) break;
-    ficheros.push(candidato);
-    reunidas += candidato.archivo.count;
-  }
+    )
+    .slice(0, MAX_FICHEROS_AGREGADOS);
 
   const lotes = await Promise.all(
     ficheros.map(({ categoria, archivo }) =>
@@ -194,13 +183,18 @@ export async function obtenerPaginaAgregada(
   );
 
   const articulos = porFecha(lotes.flatMap((parte) => parte?.articles ?? []));
+
+  // Las páginas las marca lo que se puede servir, no el fondo de la sección:
+  // el resto está a un toque en las subsecciones.
+  const paginas = Math.max(1, Math.ceil(articulos.length / porPagina));
+  const actual = Math.min(Math.max(1, pagina), paginas);
   const desde = (actual - 1) * porPagina;
 
   return {
     articulos: articulos.slice(desde, desde + porPagina),
     total,
     pagina: actual,
-    paginas: Math.max(1, Math.ceil(articulos.length / porPagina)),
+    paginas,
   };
 }
 
