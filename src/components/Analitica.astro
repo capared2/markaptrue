@@ -1,0 +1,37 @@
+---
+import { SITIO } from "../lib/sitio";
+
+/**
+ * Medición con Google Analytics (gtag.js).
+ *
+ * Va en el `<head>` de Base.astro, así que cubre todas las páginas del sitio.
+ * El fragmento es idéntico para todo el mundo y la medición ocurre en el
+ * navegador, de modo que convive con la caché de página del edge
+ * (ver middleware.ts): servir el mismo HTML no mezcla visitas.
+ *
+ * Se apaga con la variable de entorno ANALITICA=0, igual que los anuncios;
+ * así el desarrollo local no ensucia las estadísticas.
+ */
+const activa = import.meta.env.ANALITICA !== "0";
+
+const codigo = `
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', ${JSON.stringify(SITIO.analitica)});
+`;
+---
+
+{
+  activa && (
+    <Fragment>
+      <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+      <script
+        is:inline
+        async
+        src={`https://www.googletagmanager.com/gtag/js?id=${SITIO.analitica}`}
+      />
+      <script is:inline set:html={codigo} />
+    </Fragment>
+  )
+}

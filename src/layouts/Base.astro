@@ -4,6 +4,7 @@ import Cabecera from "../components/Cabecera.astro";
 import Pie from "../components/Pie.astro";
 import Seo from "../components/Seo.astro";
 import Anuncios from "../components/Anuncios.astro";
+import Analitica from "../components/Analitica.astro";
 import type { Indice } from "../lib/types";
 import { SITIO } from "../lib/sitio";
 
@@ -59,6 +60,8 @@ Astro.response.headers.set(
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <Seo titulo={titulo} descripcion={descripcion} canonical={canonical} idioma={idioma} {...seo} />
+
+    <Analitica />
 
     <link rel="dns-prefetch" href="https://www.highperformanceformat.com" />
     <link rel="dns-prefetch" href="https://pl30939588.effectivecpmnetwork.com" />
