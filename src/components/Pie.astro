@@ -2,6 +2,7 @@
 import type { Indice } from "../lib/types";
 import { fecha } from "../lib/format";
 import { SITIO } from "../lib/sitio";
+import { ENLACE_DIRECTO } from "../lib/anuncios";
 
 interface Props {
   indice: Indice | null;
@@ -19,6 +20,15 @@ const { indice } = Astro.props;
       Agregador de noticias. Cada una enlaza a su publicación original, cuyos
       derechos pertenecen al medio que la publicó.
     </span>
+    <span aria-hidden="true">·</span>
+    <a
+      href={ENLACE_DIRECTO}
+      target="_blank"
+      rel="sponsored nofollow noopener"
+      class="underline underline-offset-2 hover:text-[var(--color-marca)]"
+    >
+      Ofertas patrocinadas
+    </a>
     {
       indice && (
         <time class="w-full sm:ms-auto sm:w-auto whitespace-nowrap" datetime={indice.generated_at}>

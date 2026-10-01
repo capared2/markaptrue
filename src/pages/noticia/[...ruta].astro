@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import Tarjeta from "../../components/Tarjeta.astro";
 import Banner from "../../components/Banner.astro";
 import BannerNativo from "../../components/BannerNativo.astro";
+import { ENLACE_DIRECTO } from "../../lib/anuncios";
 import { obtenerIndice, obtenerNoticia, obtenerRelacionadas } from "../../lib/data";
 import { contextoDe } from "../../lib/cache";
 import { enlaceCategoria, enlaceNoticia, fecha, nombreCategoria } from "../../lib/format";
@@ -152,6 +153,15 @@ const galeria = (noticia.images ?? []).slice(1, 5);
         class="underline underline-offset-2 hover:text-[var(--color-marca)]"
       >
         Ver fuente original de la noticia
+      </a>
+      <span aria-hidden="true" class="mx-2">·</span>
+      <a
+        href={ENLACE_DIRECTO}
+        target="_blank"
+        rel="sponsored nofollow noopener"
+        class="underline underline-offset-2 hover:text-[var(--color-marca)]"
+      >
+        Contenido patrocinado
       </a>
     </p>
   </article>

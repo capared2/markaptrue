@@ -45,6 +45,21 @@ export const NATIVO = {
   script: "https://pl30939588.effectivecpmnetwork.com/a64c7e57da5513c2f5669e608ac7157c/invoke.js",
 };
 
+/**
+ * Enlace directo (smartlink): no es un banner, es una URL que rota ofertas.
+ * Se usa como enlace de texto discreto y marcado como patrocinado.
+ */
+export const ENLACE_DIRECTO =
+  "https://www.profitableratecpmnetwork.com/f09s98b1m?key=7395582c81f235eae1492472b1f2ead3";
+
+/**
+ * Script de la red que se carga una vez por página. Se pide tarde (tras la
+ * primera interacción o cuando el navegador está libre) para que no compita
+ * con la lectura ni salte nada nada más abrir.
+ */
+export const SCRIPT_DIFERIDO =
+  "https://pl30933674.profitableratecpmnetwork.com/8c/2f/7d/8c2f7db2c63f127fdafad6c69bd49a8e.js";
+
 export const BASE_INVOKE = "https://www.highperformanceformat.com";
 
 /** Altura que se reserva antes de cargar, para que nada salte al aparecer. */
