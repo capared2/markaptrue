@@ -1,0 +1,211 @@
+---
+import type { Indice } from "../lib/types";
+import { enlaceCategoria, etiquetaCategoria, numero } from "../lib/format";
+import { agruparSecciones } from "../lib/categorias";
+
+/**
+ * Navegación de móvil al estilo de una app: barra de pestañas fija abajo, al
+ * alcance del pulgar, y dos hojas que suben desde el borde (Secciones y
+ * Buscar). En escritorio no se pinta: allí manda la cabecera.
+ */
+interface Props {
+  indice: Indice | null;
+  categoriaActiva?: string;
+}
+
+const { indice, categoriaActiva } = Astro.props;
+const secciones = agruparSecciones(indice);
+const ruta = Astro.url.pathname;
+
+const enPortada = ruta === "/";
+const enBuscar = ruta.startsWith("/buscar");
+const enSecciones = !!categoriaActiva || ruta.startsWith("/categoria");
+
+const pestana =
+  "flex flex-1 flex-col items-center justify-center gap-0.5 pt-1.5 text-[0.65rem] font-semibold tracking-wide transition-colors active:scale-95";
+const inactiva = "text-[var(--color-tinta-tenue)]";
+const activa = "text-[var(--color-marca)]";
+---
+
+<nav
+  aria-label="Navegación principal"
+  class="app-pestanas fixed inset-x-0 bottom-0 z-30 flex border-t border-[var(--color-linea)] bg-[var(--color-lienzo)]/95 backdrop-blur lg:hidden"
+>
+  <a href="/" class:list={[pestana, enPortada ? activa : inactiva]} aria-current={enPortada ? "page" : undefined}>
+    <svg class="size-6" viewBox="0 0 24 24" fill={enPortada ? "currentColor" : "none"} stroke="currentColor"
+      stroke-width="1.8" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"></path>
+    </svg>
+    Portada
+  </a>
+
+  <button type="button" data-abrir-hoja="hoja-secciones" class:list={[pestana, enSecciones ? activa : inactiva]}>
+    <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+      stroke-linejoin="round" aria-hidden="true">
+      <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" fill={enSecciones ? "currentColor" : "none"}></rect>
+      <rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect>
+      <rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect>
+      <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" fill={enSecciones ? "currentColor" : "none"}></rect>
+    </svg>
+    Secciones
+  </button>
+
+  <button type="button" data-abrir-hoja="hoja-buscar" class:list={[pestana, enBuscar ? activa : inactiva]}>
+    <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width={enBuscar ? 2.6 : 1.8}
+      stroke-linecap="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="M20 20l-3.5-3.5"></path>
+    </svg>
+    Buscar
+  </button>
+
+  <button type="button" data-cambiar-tema class:list={[pestana, inactiva]} aria-label="Cambiar entre tema claro y oscuro">
+    <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+      <path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"></path>
+    </svg>
+    Tema
+  </button>
+</nav>
+
+<dialog id="hoja-secciones" class="app-hoja" aria-label="Secciones">
+  <div class="app-hoja-panel">
+    <div class="app-hoja-asa" aria-hidden="true"></div>
+    <div class="flex items-center justify-between px-5 pb-3">
+      <h2 class="font-display text-2xl font-extrabold uppercase tracking-tight">Secciones</h2>
+      <button type="button" data-cerrar-hoja class="app-hoja-cerrar" aria-label="Cerrar">
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+      </button>
+    </div>
+
+    <div class="app-hoja-cuerpo">
+      <div class="grid grid-cols-2 gap-2 px-5">
+        {
+          secciones.map(({ raiz, total }) => {
+            const actual = categoriaActiva === raiz || categoriaActiva?.startsWith(`${raiz}/`);
+            return (
+              <a
+                href={enlaceCategoria(raiz)}
+                aria-current={actual ? "page" : undefined}
+                class:list={[
+                  "flex flex-col rounded-xl border px-3.5 py-3 active:scale-[0.98] transition-transform",
+                  actual
+                    ? "border-[var(--color-marca)] bg-[var(--color-marca-claro)] text-[var(--color-marca)]"
+                    : "border-[var(--color-linea)] bg-[var(--color-lienzo-alt)]",
+                ]}
+              >
+                <span class="truncate font-bold">{etiquetaCategoria(raiz)}</span>
+                <span class="text-xs tabular-nums text-[var(--color-tinta-tenue)]">{numero(total)} noticias</span>
+              </a>
+            );
+          })
+        }
+      </div>
+
+      <a
+        href="/categorias"
+        class="mx-5 mt-4 flex items-center justify-between rounded-xl px-1 py-3 font-semibold text-[var(--color-marca)]"
+      >
+        Todas las categorías
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+      </a>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="hoja-buscar" class="app-hoja" aria-label="Buscar">
+  <div class="app-hoja-panel">
+    <div class="app-hoja-asa" aria-hidden="true"></div>
+    <form action="/buscar" method="get" role="search" class="flex items-center gap-2 px-5 pb-5">
+      <label for="q-app" class="sr-only">Buscar noticias</label>
+      <div class="relative flex-1">
+        <svg class="pointer-events-none absolute left-3.5 top-1/2 size-5 -translate-y-1/2 stroke-[var(--color-tinta-tenue)]"
+          viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="M20 20l-3.5-3.5"></path>
+        </svg>
+        <input
+          id="q-app"
+          name="q"
+          type="search"
+          enterkeyhint="search"
+          placeholder="Titulares, autores, etiquetas…"
+          autocomplete="off"
+          class="w-full rounded-full border border-[var(--color-linea)] bg-[var(--color-lienzo-alt)] py-3 pl-11 pr-4 text-base outline-none placeholder:text-[var(--color-tinta-tenue)] focus:border-[var(--color-marca)]"
+        />
+      </div>
+      <button type="button" data-cerrar-hoja class="px-2 py-3 text-sm font-semibold text-[var(--color-marca)]">
+        Cancelar
+      </button>
+    </form>
+  </div>
+</dialog>
+
+<script is:inline>
+  (function () {
+    function abrir(hoja) {
+      if (!hoja || hoja.open) return;
+      document.querySelectorAll("dialog.app-hoja[open]").forEach(function (d) { d.close(); });
+      hoja.showModal();
+      var campo = hoja.querySelector("input");
+      if (campo) setTimeout(function () { campo.focus(); }, 60);
+    }
+
+    function cerrar(hoja) {
+      if (!hoja || !hoja.open || hoja.dataset.cerrando) return;
+      hoja.dataset.cerrando = "1";
+      setTimeout(function () {
+        delete hoja.dataset.cerrando;
+        hoja.close();
+      }, 220);
+    }
+
+    document.addEventListener("click", function (e) {
+      var boton = e.target.closest("[data-abrir-hoja]");
+      if (boton) return abrir(document.getElementById(boton.getAttribute("data-abrir-hoja")));
+      var cierre = e.target.closest("[data-cerrar-hoja]");
+      if (cierre) return cerrar(cierre.closest("dialog"));
+      // Un toque en el fondo oscuro cierra la hoja, como en cualquier app.
+      if (e.target.matches && e.target.matches("dialog.app-hoja")) cerrar(e.target);
+    });
+
+    document.querySelectorAll("dialog.app-hoja").forEach(function (hoja) {
+      // Escape también anima la salida en vez de cortar en seco.
+      hoja.addEventListener("cancel", function (e) {
+        e.preventDefault();
+        cerrar(hoja);
+      });
+
+      // Arrastrar la hoja hacia abajo la cierra.
+      var panel = hoja.querySelector(".app-hoja-panel");
+      var cuerpo = hoja.querySelector(".app-hoja-cuerpo");
+      var inicio = null;
+      var delta = 0;
+      panel.addEventListener("touchstart", function (e) {
+        if (cuerpo && cuerpo.contains(e.target) && cuerpo.scrollTop > 0) return;
+        inicio = e.touches[0].clientY;
+        delta = 0;
+      }, { passive: true });
+      panel.addEventListener("touchmove", function (e) {
+        if (inicio === null) return;
+        delta = Math.max(0, e.touches[0].clientY - inicio);
+        panel.style.transition = "none";
+        panel.style.transform = "translateY(" + delta + "px)";
+      }, { passive: true });
+      panel.addEventListener("touchend", function () {
+        if (inicio === null) return;
+        inicio = null;
+        panel.style.transition = "";
+        panel.style.transform = "";
+        if (delta > 90) cerrar(hoja);
+      });
+    });
+
+    // Al volver atrás con una hoja abierta (caché del navegador), que no
+    // reaparezca abierta.
+    addEventListener("pageshow", function () {
+      document.querySelectorAll("dialog.app-hoja[open]").forEach(function (d) { d.close(); });
+    });
+  })();
+</script>

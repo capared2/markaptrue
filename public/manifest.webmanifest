@@ -1,0 +1,23 @@
+{
+  "name": "jomperr · Noticias deportivas",
+  "short_name": "jomperr",
+  "description": "Toda la actualidad deportiva reunida en un solo sitio.",
+  "lang": "es",
+  "id": "/",
+  "start_url": "/?app=1",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f7f9",
+  "theme_color": "#ffffff",
+  "categories": ["news", "sports"],
+  "icons": [
+    { "src": "/iconos/icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/iconos/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/iconos/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Buscar", "url": "/buscar", "icons": [{ "src": "/iconos/icono-192.png", "sizes": "192x192" }] },
+    { "name": "Categorías", "url": "/categorias", "icons": [{ "src": "/iconos/icono-192.png", "sizes": "192x192" }] }
+  ]
+}

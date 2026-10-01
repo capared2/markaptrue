@@ -25,7 +25,8 @@ const principales = [...new Set((indice?.categories ?? []).map((c) => c.category
 ---
 
 <header
-  class="sticky top-0 z-20 border-b border-[var(--color-linea)] bg-[var(--color-lienzo)]/95 backdrop-blur"
+  data-cabecera
+  class="app-cabecera sticky top-0 z-20 border-b border-[var(--color-linea)] bg-[var(--color-lienzo)]/95 backdrop-blur"
 >
   <div class="contenedor flex flex-wrap items-center gap-x-3 gap-y-2 py-3">
     <a
@@ -46,13 +47,13 @@ const principales = [...new Set((indice?.categories ?? []).map((c) => c.category
       </span>
     </a>
 
-    <!-- En móvil el buscador va en su propia fila: encajado en la primera
-         aplastaba el campo y empujaba el botón de tema fuera de la pantalla. -->
+    <!-- En móvil el buscador y el tema viven en la barra de pestañas de abajo
+         (BarraApp.astro): la cabecera se queda en logo y secciones, como en una app. -->
     <form
       action="/buscar"
       method="get"
       role="search"
-      class="order-last w-full basis-full sm:order-none sm:ml-auto sm:w-auto sm:max-w-sm sm:flex-1 sm:basis-auto"
+      class="hidden lg:ml-auto lg:block lg:w-auto lg:max-w-sm lg:flex-1"
     >
       <label for="q" class="sr-only">Buscar noticias</label>
       <div class="relative">
@@ -81,8 +82,9 @@ const principales = [...new Set((indice?.categories ?? []).map((c) => c.category
     <button
       type="button"
       id="cambiar-tema"
+      data-cambiar-tema
       aria-label="Cambiar entre tema claro y oscuro"
-      class="grid size-9 shrink-0 place-items-center rounded-full border border-[var(--color-linea)] text-[var(--color-tinta-suave)] hover:border-[var(--color-marca)] hover:text-[var(--color-marca)]"
+      class="hidden lg:grid size-9 shrink-0 place-items-center rounded-full border border-[var(--color-linea)] text-[var(--color-tinta-suave)] hover:border-[var(--color-marca)] hover:text-[var(--color-marca)]"
     >
       <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"></path>
@@ -142,12 +144,43 @@ const principales = [...new Set((indice?.categories ?? []).map((c) => c.category
     barra.scrollTo({ left: Math.max(0, centro), behavior: "instant" in document.body.style ? "instant" : "auto" });
   })();
 
-  document.getElementById("cambiar-tema")?.addEventListener("click", () => {
+  // Hay dos botones de tema: el de la cabecera (escritorio) y el de la barra
+  // de pestañas (móvil).
+  document.addEventListener("click", (evento) => {
+    if (!evento.target.closest("[data-cambiar-tema]")) return;
     const oscuro = document.documentElement.classList.toggle("oscuro");
+    window.pintarBarraEstado?.();
     // Con el almacenamiento bloqueado el tema cambia igual, solo que no se
     // recuerda al cambiar de pagina. Guardarlo sin red lanzaba en la consola.
     try {
       localStorage.setItem("tema", oscuro ? "oscuro" : "claro");
     } catch (e) {}
   });
+
+  // En móvil la cabecera se esconde al bajar leyendo y vuelve al subir un
+  // poco, como en las apps de noticias: deja toda la pantalla al texto.
+  (function () {
+    var cabecera = document.querySelector("[data-cabecera]");
+    var movil = window.matchMedia("(max-width: 1023px)");
+    if (!cabecera) return;
+    var ultima = scrollY;
+    var pendiente = false;
+    addEventListener(
+      "scroll",
+      function () {
+        if (pendiente) return;
+        pendiente = true;
+        requestAnimationFrame(function () {
+          pendiente = false;
+          var y = scrollY;
+          var oculta = movil.matches && y > 160 && y > ultima + 4;
+          var visible = y < ultima - 4 || y < 160 || !movil.matches;
+          if (oculta) cabecera.classList.add("app-cabecera-oculta");
+          else if (visible) cabecera.classList.remove("app-cabecera-oculta");
+          ultima = y;
+        });
+      },
+      { passive: true },
+    );
+  })();
 </script>

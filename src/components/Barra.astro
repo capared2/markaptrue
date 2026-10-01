@@ -1,6 +1,7 @@
 ---
 import type { Indice } from "../lib/types";
 import { enlaceCategoria, etiquetaCategoria, numero } from "../lib/format";
+import { agruparSecciones } from "../lib/categorias";
 
 interface Props {
   indice: Indice | null;
@@ -9,22 +10,7 @@ interface Props {
 
 const { indice, activa } = Astro.props;
 
-// Agrupa "futbol/real-madrid" bajo su seccion raiz "futbol".
-const grupos = new Map<string, { clave: string; total: number }[]>();
-for (const entrada of indice?.categories ?? []) {
-  const raiz = entrada.category.split("/")[0]!;
-  const lista = grupos.get(raiz) ?? [];
-  lista.push({ clave: entrada.category, total: entrada.articles });
-  grupos.set(raiz, lista);
-}
-
-const ordenados = [...grupos.entries()]
-  .map(([raiz, hijos]) => ({
-    raiz,
-    total: hijos.reduce((suma, h) => suma + h.total, 0),
-    hijos: hijos.sort((a, b) => b.total - a.total),
-  }))
-  .sort((a, b) => b.total - a.total);
+const ordenados = agruparSecciones(indice);
 ---
 
 <!--

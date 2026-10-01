@@ -5,6 +5,7 @@ import Pie from "../components/Pie.astro";
 import Seo from "../components/Seo.astro";
 import Anuncios from "../components/Anuncios.astro";
 import Analitica from "../components/Analitica.astro";
+import BarraApp from "../components/BarraApp.astro";
 import type { Indice } from "../lib/types";
 import { SITIO } from "../lib/sitio";
 
@@ -58,7 +59,7 @@ Astro.response.headers.set(
 <html lang={idioma}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <Seo titulo={titulo} descripcion={descripcion} canonical={canonical} idioma={idioma} {...seo} />
 
     <Analitica />
@@ -73,8 +74,16 @@ Astro.response.headers.set(
       rel="stylesheet"
     />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
-    <meta name="theme-color" content="#d8232a" />
+    <link rel="apple-touch-icon" href="/iconos/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content={SITIO.nombre} />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="format-detection" content="telephone=no" />
+    <!-- La barra de estado del móvil toma el color de la cabecera, así la
+         página parece pegada al sistema. Se ajusta al cambiar de tema. -->
+    <meta name="theme-color" content="#ffffff" />
 
     <script is:inline>
       // Las fotos las sirve cada medio de origen: si alguna desaparece, se
@@ -97,6 +106,19 @@ Astro.response.headers.set(
       } catch (e) {}
       const oscuro = guardado ? guardado === "oscuro" : matchMedia("(prefers-color-scheme: dark)").matches;
       document.documentElement.classList.toggle("oscuro", oscuro);
+
+      window.pintarBarraEstado = function () {
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.content = document.documentElement.classList.contains("oscuro") ? "#151a23" : "#ffffff";
+      };
+      window.pintarBarraEstado();
+
+      // Instalable y con lectura sin conexión de lo ya visto.
+      if ("serviceWorker" in navigator) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
     </script>
   </head>
   <body class="min-h-screen flex flex-col">
@@ -114,6 +136,8 @@ Astro.response.headers.set(
     </main>
 
     <Pie indice={indice} />
+
+    <BarraApp indice={indice} categoriaActiva={categoriaActiva} />
 
     <Anuncios />
   </body>

@@ -69,3 +69,167 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ------------------------------------------------------------------------
+   Modo app en móvil: barra de pestañas, hojas que suben desde abajo,
+   cabecera que se esconde al leer y transiciones entre páginas.
+   ------------------------------------------------------------------------ */
+
+/* Fundido suave al cambiar de página, sin JavaScript (Chrome y Safari). */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    /* Que el rebote del scroll no arrastre la página entera en Android. */
+    overscroll-behavior-y: none;
+  }
+
+  /* Los controles no se seleccionan al mantener pulsado, como en una app. */
+  button,
+  nav a,
+  .app-pestanas {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  @media (max-width: 1023px) {
+    body {
+      /* Hueco para la barra de pestañas y la zona del gesto de inicio. */
+      padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+    }
+
+    /* Toque con respuesta visual: atenúa al pulsar. */
+    a:active,
+    button:active {
+      opacity: 0.7;
+    }
+  }
+}
+
+.app-cabecera {
+  padding-top: env(safe-area-inset-top);
+  transition: transform 0.25s ease;
+}
+
+.app-cabecera-oculta {
+  transform: translateY(-100%);
+}
+
+.app-pestanas {
+  height: calc(4rem + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+}
+
+/* Hojas modales que suben desde abajo. */
+dialog.app-hoja {
+  margin: 0;
+  margin-top: auto;
+  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-tinta);
+  inset: auto 0 0 0;
+  overflow: visible;
+}
+
+dialog.app-hoja::backdrop {
+  background: rgb(0 0 0 / 0.45);
+  animation: app-fundido 0.22s ease;
+}
+
+dialog.app-hoja[data-cerrando]::backdrop {
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.app-hoja-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  max-height: 85dvh;
+  border-radius: 1.25rem 1.25rem 0 0;
+  background: var(--color-lienzo);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -8px 30px rgb(0 0 0 / 0.18);
+  animation: app-subir 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
+  transition: transform 0.22s ease;
+}
+
+dialog.app-hoja[data-cerrando] .app-hoja-panel {
+  transform: translateY(100%) !important;
+}
+
+.app-hoja-asa {
+  width: 2.5rem;
+  height: 0.3rem;
+  margin: 0.6rem auto 0.9rem;
+  border-radius: 999px;
+  background: var(--color-linea);
+}
+
+.app-hoja-cuerpo {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 1.25rem;
+}
+
+.app-hoja-cerrar {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  background: var(--color-lienzo-alt);
+  color: var(--color-tinta-suave);
+}
+
+html:has(dialog.app-hoja[open]) {
+  overflow: hidden;
+}
+
+@keyframes app-subir {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes app-fundido {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Abierta como app instalada: la interfaz no se selecciona al mantener
+   pulsado, pero el texto de las noticias sí. */
+@media (display-mode: standalone) {
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  article,
+  main p {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+}
